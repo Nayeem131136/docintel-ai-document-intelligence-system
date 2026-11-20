@@ -71,7 +71,7 @@ def _event(document: Document, stage: str, outcome: str, message: str = "", dura
     )
 
 
-def _store_pages(document: Document, extraction: Extraction) -> tuple[int, int]:
+def _store_pages(document: Document, extraction: Extraction, progress_cap: int = 99) -> tuple[int, int]:
     """Write pages in batches, updating progress. Returns (pages_ok, pages_failed)."""
     ok = failed = 0
     batch: list[DocumentPage] = []
@@ -82,7 +82,7 @@ def _store_pages(document: Document, extraction: Extraction) -> tuple[int, int]:
             batch.clear()
         done = ok + failed
         document.pages_processed = done
-        document.progress = min(99, int(100 * done / max(1, extraction.total)))
+        document.progress = min(progress_cap, int(progress_cap * done / max(1, extraction.total)))
         document.save(update_fields=["pages_processed", "progress", "updated_at"])
 
     for page in extraction.pages:
@@ -109,8 +109,11 @@ def _store_pages(document: Document, extraction: Extraction) -> tuple[int, int]:
     return ok, failed
 
 
-def extract_document_text(document: Document) -> Document:
+def extract_document_text(document: Document, finalize: bool = True) -> Document:
     """Run text extraction / OCR / spreadsheet parsing for one document.
+
+    With ``finalize=False`` (used by the full pipeline) a successful run leaves the
+    status as PROCESSING so the AI-extraction stage can continue; failures are final.
 
     Safe to call again (reprocessing): previous pages are replaced and the attempt
     counter increases. Never raises for expected failures; the document is marked
@@ -136,12 +139,15 @@ def extract_document_text(document: Document) -> Document:
         document.page_count = extraction.total
         document.save(update_fields=["file_type", "page_count", "updated_at"])
 
-        ok, failed = _store_pages(document, extraction)
+        ok, failed = _store_pages(document, extraction, progress_cap=99 if finalize else 55)
 
         if ok == 0:
             raise ProcessingError(f"None of the {failed} page(s) could be read.")
-        document.status = Document.Status.NEEDS_REVIEW if failed else Document.Status.COMPLETED
-        document.progress = 100
+        if finalize:
+            document.status = Document.Status.NEEDS_REVIEW if failed else Document.Status.COMPLETED
+            document.progress = 100
+        else:
+            document.progress = 55
         if failed:
             document.error_message = f"{failed} of {extraction.total} page(s) could not be read."
         outcome, message = ProcessingEvent.Outcome.SUCCESS, f"{ok} page(s) extracted, {failed} failed."

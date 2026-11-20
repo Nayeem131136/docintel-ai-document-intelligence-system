@@ -127,6 +127,15 @@ OCR_DPI = int(os.environ.get("OCR_DPI", "200"))
 MAX_SPREADSHEET_ROWS = int(os.environ.get("MAX_SPREADSHEET_ROWS", "100000"))
 ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".xlsx", ".xls", ".csv"}
 
+# --- LLM extraction (Phase 3) ---------------------------------------------
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "")
+GROQ_BASE_URL = os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+LLM_TIMEOUT = int(os.environ.get("LLM_TIMEOUT", "60"))
+LLM_MAX_RETRIES = int(os.environ.get("LLM_MAX_RETRIES", "3"))
+EXTRACTION_MAX_CHARS = int(os.environ.get("EXTRACTION_MAX_CHARS", "30000"))
+LOW_OCR_CONFIDENCE = float(os.environ.get("LOW_OCR_CONFIDENCE", "0.80"))
+
 # --- REST framework / CORS ------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],

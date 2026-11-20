@@ -7,7 +7,7 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phases 1-2 (foundation, document processing) are complete. See the roadmap below.
+> Phases 1-3 (foundation, document processing, AI extraction and validation) are complete. See the roadmap below.
 
 ## Roadmap
 
@@ -15,7 +15,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 |---|---|---|
 | 1 | Foundation: Docker Compose, Django, Celery, database schema, health endpoint | Done |
 | 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Done |
-| 3 | AI extraction and validation | Planned |
+| 3 | AI extraction, validation, cross-verification | Done |
 | 4 | REST API and background jobs | Planned |
 | 5 | Keyword and semantic search | Planned |
 | 6 | React frontend | Planned |
@@ -28,7 +28,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 - **Background jobs:** Celery + Redis
 - **Database:** PostgreSQL with pgvector (SQLite for no-Docker local mode)
 - **Document processing:** PyMuPDF (PDF), RapidOCR (OCR, runs locally on CPU), openpyxl / xlrd / csv (spreadsheets)
-- **LLM:** Groq API (from Phase 3)
+- **LLM:** Groq API (OpenAI-compatible, JSON mode); rule-based fallback when unavailable
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS (Phase 6)
 
 ## Setup
@@ -79,24 +79,32 @@ python manage.py test
 Inside Docker: `docker compose exec api python manage.py test` (the XLS test is skipped there
 because test-only packages are not installed in the image).
 
-## Try the document-processing pipeline (Phase 2)
+## Try the pipeline from the command line
 
-Run any PDF, image, Excel or CSV file through text extraction / OCR and print the result:
+Run any PDF, image, Excel or CSV file through the full pipeline (OCR, AI extraction, validation,
+cross-verification) and print the extracted invoices and any issues:
 
 ```bash
 cd backend
 python manage.py migrate                                   # first time only (local mode)
-python manage.py process_files path/to/invoice.pdf path/to/scan.png --show-text
+python manage.py process_files path/to/invoice.pdf path/to/scan.png
 python manage.py process_files path/to/folder --json-out summary.json
+python manage.py process_files invoice.pdf --show-text      # also print the raw extracted text
+python manage.py process_files invoice.pdf --no-llm         # rule-based extraction only
 ```
 
-With Docker, copy the file into a folder you mounted, or use local mode.
-See [docs/PROCESSING.md](docs/PROCESSING.md) for how each file type is handled.
+To use the LLM, put `GROQ_API_KEY` and `GROQ_MODEL` in `.env` (see `.env.example`).
+Without them the pipeline automatically uses the rule-based extractor.
+Process an invoice PDF and an Excel register containing the same invoice to see cross-verification.
+
+- [docs/PROCESSING.md](docs/PROCESSING.md): how each file type is read
+- [docs/EXTRACTION.md](docs/EXTRACTION.md): AI extraction, validation and cross-verification
 
 ## Documentation
 
 - [Database schema](docs/DATABASE_SCHEMA.md)
 - [Document processing pipelines](docs/PROCESSING.md)
+- [AI extraction, validation and cross-verification](docs/EXTRACTION.md)
 
 ## License
 
