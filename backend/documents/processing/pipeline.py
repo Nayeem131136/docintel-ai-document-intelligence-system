@@ -40,7 +40,7 @@ def sha256_of(path: str | Path) -> str:
     return digest.hexdigest()
 
 
-def create_document_from_path(path: str | Path, original_filename: str | None = None) -> Document:
+def create_document_from_path(path: str | Path, original_filename: str | None = None, owner=None) -> Document:
     """Validate a local file and store it as a QUEUED Document.
 
     Raises ProcessingError subclasses for unsupported / empty / oversized files,
@@ -51,6 +51,7 @@ def create_document_from_path(path: str | Path, original_filename: str | None = 
     file_type = detect_file_type(path, name)
     with open(path, "rb") as handle:
         document = Document(
+            owner=owner,
             original_filename=name[:255],
             file_type=file_type,
             size_bytes=path.stat().st_size,

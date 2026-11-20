@@ -21,9 +21,17 @@ class Command(BaseCommand):
         parser.add_argument("paths", nargs="+", help="Files or folders to process.")
         parser.add_argument("--show-text", action="store_true", help="Print the extracted text of every page.")
         parser.add_argument("--json-out", help="Write a JSON summary to this file.")
+        parser.add_argument("--owner", help="Username that should own the documents (so they show up in the web app).")
         parser.add_argument("--no-llm", action="store_true", help="Skip the LLM and use rule-based extraction only.")
 
     def handle(self, *args, **options):
+        owner = None
+        if options["owner"]:
+            from django.contrib.auth import get_user_model
+            owner = get_user_model().objects.filter(username=options["owner"]).first()
+            if owner is None:
+                self.stderr.write(self.style.ERROR(f"No such user: {options['owner']}"))
+                return
         files = self._collect(options["paths"])
         if not files:
             self.stderr.write(self.style.ERROR("No supported files found."))
@@ -33,7 +41,7 @@ class Command(BaseCommand):
         self.stdout.write(f"{'FILE':40} {'TYPE':6} {'STATUS':13} {'PAGES':>6} {'TIME(ms)':>9}")
         for path in files:
             try:
-                document = create_document_from_path(path)
+                document = create_document_from_path(path, owner=owner)
             except ProcessingError as exc:
                 self.stdout.write(f"{path.name[:40]:40} {'-':6} {'rejected':13} {'-':>6} {'-':>9}  {exc}")
                 summary.append({"file": path.name, "status": "rejected", "error": str(exc)})

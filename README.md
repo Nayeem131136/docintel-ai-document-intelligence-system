@@ -7,7 +7,7 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phases 1-3 (foundation, document processing, AI extraction and validation) are complete. See the roadmap below.
+> Phases 1-4 (foundation, document processing, AI extraction and validation, REST API with background jobs) are complete. See the roadmap below.
 
 ## Roadmap
 
@@ -16,7 +16,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 | 1 | Foundation: Docker Compose, Django, Celery, database schema, health endpoint | Done |
 | 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Done |
 | 3 | AI extraction, validation, cross-verification | Done |
-| 4 | REST API and background jobs | Planned |
+| 4 | REST API and background jobs | Done |
 | 5 | Keyword and semantic search | Planned |
 | 6 | React frontend | Planned |
 | 7 | Tests and evaluation | Planned |
@@ -79,6 +79,24 @@ python manage.py test
 Inside Docker: `docker compose exec api python manage.py test` (the XLS test is skipped there
 because test-only packages are not installed in the image).
 
+## Use the REST API
+
+Full reference: [docs/API.md](docs/API.md).
+
+```bash
+# Docker: the worker container runs background jobs automatically
+docker compose exec api python manage.py create_api_user alice      # prints a token
+
+# Local mode without Redis: run jobs inline (set in .env) ...
+#   CELERY_TASK_ALWAYS_EAGER=true
+# ... or with Redis, start a worker in a second terminal:
+#   celery -A config worker -l info          (Windows: add --pool=solo)
+
+TOKEN=<paste token>
+curl -H "Authorization: Token $TOKEN" -F files=@invoice.pdf http://localhost:8000/api/documents/
+curl -H "Authorization: Token $TOKEN" http://localhost:8000/api/documents/            # list
+```
+
 ## Try the pipeline from the command line
 
 Run any PDF, image, Excel or CSV file through the full pipeline (OCR, AI extraction, validation,
@@ -102,6 +120,7 @@ Process an invoice PDF and an Excel register containing the same invoice to see 
 
 ## Documentation
 
+- [REST API](docs/API.md)
 - [Database schema](docs/DATABASE_SCHEMA.md)
 - [Document processing pipelines](docs/PROCESSING.md)
 - [AI extraction, validation and cross-verification](docs/EXTRACTION.md)

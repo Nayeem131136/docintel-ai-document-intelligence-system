@@ -196,5 +196,5 @@ def final_status(document: Document) -> str:
     flagged = (document.results.filter(review_status=ExtractionResult.ReviewStatus.NEEDS_REVIEW).exists()
                or not document.results.exists()
                or document.pages.filter(has_error=True).exists()
-               or document.issues.filter(result__isnull=True, severity__in=("error", "warning")).exists())
+               or document.issues.filter(result__isnull=True, resolved=False, severity__in=("error", "warning")).exists())
     return Document.Status.NEEDS_REVIEW if flagged else Document.Status.COMPLETED

@@ -14,9 +14,19 @@ Money fields are nullable on purpose: a missing value is stored as NULL and is
 never invented or defaulted to zero.
 A vector-embedding table for semantic search is added in Phase 5.
 """
+import re
 import uuid
+from pathlib import Path
 
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
+
+
+def upload_path(instance, filename: str) -> str:
+    """Store files under a random name: no collisions, no user-controlled path or name on disk."""
+    extension = re.sub(r"[^a-z0-9]", "", Path(filename).suffix.lower())[:8]
+    return f"uploads/{timezone.now():%Y/%m/%d}/{uuid.uuid4().hex}" + (f".{extension}" if extension else "")
 
 
 class Document(models.Model):
@@ -35,8 +45,10 @@ class Document(models.Model):
         FAILED = "failed", "Failed"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="documents", null=True, blank=True,
+                              on_delete=models.SET_NULL)
     original_filename = models.CharField(max_length=255)
-    file = models.FileField(upload_to="uploads/%Y/%m/%d/")
+    file = models.FileField(upload_to=upload_path)
     file_type = models.CharField(max_length=10, choices=FileType.choices)
     size_bytes = models.PositiveBigIntegerField(default=0)
     sha256 = models.CharField(max_length=64, db_index=True, help_text="Content hash to detect re-uploads.")

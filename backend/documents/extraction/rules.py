@@ -33,8 +33,7 @@ _SKIP_ITEM_WORDS = re.compile(r"\b(?:sub\s*-?\s*total|total|tax|vat|gst|discount
 
 
 def _last_amount(line: str) -> Decimal | None:
-    line = _PERCENT.sub(" ", line)
-    # Repair OCR spacing inside thousands separators: "1, 150.00" -> "1,150.00"
+
     line = re.sub(r"(?<=\d),\s+(?=\d)", "", line)
     for token in reversed(_NUMBER.findall(line)):
         amount = parse_amount(token.rstrip(".,"))

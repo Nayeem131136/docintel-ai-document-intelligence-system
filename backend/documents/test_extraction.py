@@ -491,7 +491,6 @@ class ValidationTests(TestCase):
     def test_total_that_cannot_be_checked_is_info_only(self):
         self.assertIn(("NOT_VERIFIABLE", "info"), self.codes(self.make(subtotal=None, tax=None)))
 
-
     def test_negative_future_and_old_dates_and_tax_sanity(self):
         codes = [c for c, _ in self.codes(self.make(total=Decimal("-5"), invoice_date=date(2099, 1, 1)))]
         self.assertIn("NEGATIVE_AMOUNT", codes)

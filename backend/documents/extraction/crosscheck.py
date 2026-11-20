@@ -126,11 +126,15 @@ def _flag_mismatches(document: Document, other_doc: Document, comparisons: list[
         differing = [name.replace("_", " ") for name, f in comparison["fields"].items() if not f["match"]]
         for result in ExtractionResult.objects.filter(pk__in=[comparison["result_a"], comparison["result_b"]]):
             counterpart = other_doc if result.document_id == document.pk else document
+            found = f"document {counterpart.pk}"
+            if ValidationIssue.objects.filter(result=result, code="CROSS_CHECK_MISMATCH", found=found,
+                                              resolved=False).exists():
+                continue
             ValidationIssue.objects.create(
                 document=result.document, result=result, code="CROSS_CHECK_MISMATCH", severity="error",
                 message=(f"Invoice {comparison['invoice_number']} does not match '{counterpart.original_filename}': "
                          f"{', '.join(differing)} differ."),
-                found=f"document {counterpart.pk}")
+                found=found)
             if result.review_status == ExtractionResult.ReviewStatus.OK:
                 result.review_status = ExtractionResult.ReviewStatus.NEEDS_REVIEW
                 result.save(update_fields=["review_status", "updated_at"])

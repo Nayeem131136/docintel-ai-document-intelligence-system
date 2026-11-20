@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
     "documents",
 ]
@@ -139,14 +140,26 @@ LOW_OCR_CONFIDENCE = float(os.environ.get("LOW_OCR_CONFIDENCE", "0.80"))
 # --- REST framework / CORS ------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.TokenAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "300/hour", "user": "2000/hour"},
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "5000/hour",
+        "login": "20/min",         # token endpoint: slows password guessing
+        "uploads": "200/hour",     # upload requests
+        "reprocess": "60/hour",
+        "poll": "6000/hour",       # status polling by the UI
+    },
+    "DEFAULT_PAGINATION_CLASS": "documents.pagination.StandardPagination",
     "PAGE_SIZE": 25,
+    "EXCEPTION_HANDLER": "rest_framework.views.exception_handler",
 }
+MAX_FILES_PER_UPLOAD = int(os.environ.get("MAX_FILES_PER_UPLOAD", "20"))
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
 
 # --- Celery ---------------------------------------------------------------
@@ -156,10 +169,20 @@ CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_ACKS_LATE = True            # re-deliver a task if a worker dies mid-job
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1   # fair scheduling for long OCR jobs
 CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "7200"))   # 2 h: large scanned PDFs
+CELERY_TASK_TIME_LIMIT = CELERY_TASK_SOFT_TIME_LIMIT + 300
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # Local mode without Redis: set CELERY_TASK_ALWAYS_EAGER=true to run tasks inline.
 CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
 
 # --- Hardening when not in debug -----------------------------------------
-if not DEBUG:
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+if not DEBUG and env_bool("DJANGO_SECURE_SSL", False):
+    # Enable when served over HTTPS (behind a TLS-terminating proxy).
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000

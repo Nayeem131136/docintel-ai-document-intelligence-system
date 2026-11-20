@@ -41,21 +41,18 @@ def _sniff(head: bytes) -> str | None:
     return None
 
 
-def detect_file_type(path: str | os.PathLike, original_name: str | None = None) -> str:
-    """Return one of: pdf, image, xlsx, xls, csv.
+def detect_upload_type(name: str, size: int, head: bytes) -> str:
+    """Validate a file from its name, size and first bytes (no file on disk needed).
 
+    Returns one of: pdf, image, xlsx, xls, csv.
     Raises UnsupportedFileError / CorruptedFileError / FileTooLargeError.
     """
-    path = Path(path)
-    name = original_name or path.name
     extension = Path(name).suffix.lower()
     expected = EXTENSION_TYPES.get(extension)
     if expected is None:
         raise UnsupportedFileError(
             f"Unsupported file type '{extension or 'none'}'. Supported: {SUPPORTED_DESCRIPTION}."
         )
-
-    size = path.stat().st_size
     if size == 0:
         raise CorruptedFileError("The file is empty.")
     if size > config.max_upload_bytes():
@@ -63,10 +60,7 @@ def detect_file_type(path: str | os.PathLike, original_name: str | None = None) 
             f"The file is {size / 1_048_576:.1f} MB; the limit is {config.max_upload_bytes() // 1_048_576} MB."
         )
 
-    with open(path, "rb") as handle:
-        head = handle.read(2048)
     sniffed = _sniff(head)
-
     if expected == "csv":
         if sniffed is not None:
             raise CorruptedFileError("The file has a .csv extension but its content is not plain text.")
@@ -78,7 +72,6 @@ def detect_file_type(path: str | os.PathLike, original_name: str | None = None) 
         raise CorruptedFileError(
             f"The file content is not a valid {extension.lstrip('.').upper()} (unrecognised file signature)."
         )
-
     # Excel files are commonly saved with the wrong extension (.xls holding XLSX data, or vice versa).
     if expected in ("xlsx", "xls") and sniffed in ("xlsx", "xls"):
         return sniffed
@@ -87,3 +80,11 @@ def detect_file_type(path: str | os.PathLike, original_name: str | None = None) 
             f"The file has a {extension} extension but its content looks like {sniffed.upper()}."
         )
     return expected
+
+
+def detect_file_type(path: str | os.PathLike, original_name: str | None = None) -> str:
+    """Same validation for a file on disk."""
+    path = Path(path)
+    with open(path, "rb") as handle:
+        head = handle.read(2048)
+    return detect_upload_type(original_name or path.name, path.stat().st_size, head)
