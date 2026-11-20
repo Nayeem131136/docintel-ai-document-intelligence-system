@@ -121,6 +121,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 MAX_UPLOAD_SIZE_MB = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "50"))
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+MAX_UNCOMPRESSED_MB = int(os.environ.get("MAX_UNCOMPRESSED_MB", "500"))   # zip-bomb guard for XLSX
+MAX_PDF_PAGES = int(os.environ.get("MAX_PDF_PAGES", "5000"))
+OCR_DPI = int(os.environ.get("OCR_DPI", "200"))
+MAX_SPREADSHEET_ROWS = int(os.environ.get("MAX_SPREADSHEET_ROWS", "100000"))
 ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".xlsx", ".xls", ".csv"}
 
 # --- REST framework / CORS ------------------------------------------------

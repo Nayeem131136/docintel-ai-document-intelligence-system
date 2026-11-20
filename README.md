@@ -7,14 +7,14 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phase 1 (foundation) is complete. See the roadmap below.
+> Phases 1-2 (foundation, document processing) are complete. See the roadmap below.
 
 ## Roadmap
 
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Foundation: Docker Compose, Django, Celery, database schema, health endpoint | Done |
-| 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Planned |
+| 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Done |
 | 3 | AI extraction and validation | Planned |
 | 4 | REST API and background jobs | Planned |
 | 5 | Keyword and semantic search | Planned |
@@ -27,6 +27,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 - **Backend:** Python, Django, Django REST Framework
 - **Background jobs:** Celery + Redis
 - **Database:** PostgreSQL with pgvector (SQLite for no-Docker local mode)
+- **Document processing:** PyMuPDF (PDF), RapidOCR (OCR, runs locally on CPU), openpyxl / xlrd / csv (spreadsheets)
 - **LLM:** Groq API (from Phase 3)
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS (Phase 6)
 
@@ -71,12 +72,31 @@ python manage.py runserver
 
 ```bash
 cd backend
+pip install -r requirements-dev.txt     # adds xlwt, used to build .xls test files
 python manage.py test
 ```
+
+Inside Docker: `docker compose exec api python manage.py test` (the XLS test is skipped there
+because test-only packages are not installed in the image).
+
+## Try the document-processing pipeline (Phase 2)
+
+Run any PDF, image, Excel or CSV file through text extraction / OCR and print the result:
+
+```bash
+cd backend
+python manage.py migrate                                   # first time only (local mode)
+python manage.py process_files path/to/invoice.pdf path/to/scan.png --show-text
+python manage.py process_files path/to/folder --json-out summary.json
+```
+
+With Docker, copy the file into a folder you mounted, or use local mode.
+See [docs/PROCESSING.md](docs/PROCESSING.md) for how each file type is handled.
 
 ## Documentation
 
 - [Database schema](docs/DATABASE_SCHEMA.md)
+- [Document processing pipelines](docs/PROCESSING.md)
 
 ## License
 

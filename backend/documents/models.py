@@ -73,8 +73,12 @@ class DocumentPage(models.Model):
     text = models.TextField(blank=True)
     source = models.CharField(max_length=20, choices=Source.choices)
     ocr_confidence = models.FloatField(null=True, blank=True, help_text="Mean OCR confidence 0-1, if OCR was used.")
+    table = models.JSONField(
+        null=True, blank=True,
+        help_text='Spreadsheet rows as {"rows": [[...]], "truncated": bool}; used for PDF-vs-Excel checks.',
+    )
     has_error = models.BooleanField(default=False)
-    error_message = models.TextField(blank=True)
+    error_message = models.TextField(blank=True, help_text="Error, or a non-fatal warning when has_error is false.")
 
     class Meta:
         ordering = ["document", "page_number"]
