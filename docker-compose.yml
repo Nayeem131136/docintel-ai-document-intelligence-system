@@ -37,6 +37,7 @@ services:
       - "8000:8000"
     volumes:
       - media:/app/media
+      - models:/app/.cache
     depends_on:
       db:
         condition: service_healthy
@@ -52,6 +53,7 @@ services:
     command: celery -A config worker --loglevel=info --concurrency=2
     volumes:
       - media:/app/media
+      - models:/app/.cache
     depends_on:
       db:
         condition: service_healthy
@@ -61,3 +63,4 @@ services:
 volumes:
   pgdata:
   media:
+  models:      # downloaded embedding model (about 130 MB, fetched on first use)

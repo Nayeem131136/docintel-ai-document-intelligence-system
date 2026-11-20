@@ -12,7 +12,7 @@ Entity overview (see docs/DATABASE_SCHEMA.md for the diagram):
 
 Money fields are nullable on purpose: a missing value is stored as NULL and is
 never invented or defaulted to zero.
-A vector-embedding table for semantic search is added in Phase 5.
+Search chunks (text + embedding vectors) for keyword and semantic search live in SearchChunk.
 """
 import re
 import uuid
@@ -254,3 +254,33 @@ class CrossVerification(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class SearchChunk(models.Model):
+    """One searchable piece of text: an invoice summary or a slice of a page.
+
+    Keyword search matches ``text``; semantic search compares ``embedding`` (a normalised float32 vector
+    stored as raw bytes, so it works on SQLite and PostgreSQL alike).
+    """
+
+    class Kind(models.TextChoices):
+        INVOICE = "invoice", "Invoice"
+        PAGE = "page", "Page text"
+
+    document = models.ForeignKey(Document, related_name="chunks", on_delete=models.CASCADE)
+    result = models.ForeignKey(ExtractionResult, related_name="chunks", null=True, blank=True,
+                               on_delete=models.CASCADE)
+    kind = models.CharField(max_length=10, choices=Kind.choices)
+    page_number = models.PositiveIntegerField(null=True, blank=True)
+    chunk_index = models.PositiveIntegerField(default=0)
+    text = models.TextField()
+    embedding = models.BinaryField(null=True, blank=True)
+    embedding_model = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["document_id", "kind", "page_number", "chunk_index"]
+        indexes = [models.Index(fields=["document", "kind"]), models.Index(fields=["embedding_model"])]
+
+    def __str__(self) -> str:
+        return f"{self.kind} chunk of {self.document_id}"

@@ -11,6 +11,7 @@ from django.utils import timezone
 from .extraction.service import _USE_CONFIGURED, final_status, run_extraction
 from .models import Document, ProcessingEvent
 from .processing.pipeline import extract_document_text
+from .search.indexer import safe_index_document
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,9 @@ def process_document(document: Document, llm=_USE_CONFIGURED) -> Document:
         document.error_message = f"Unexpected error during extraction ({type(exc).__name__})."
         ProcessingEvent.objects.create(document=document, stage=ProcessingEvent.Stage.AI_EXTRACTION,
                                        outcome=ProcessingEvent.Outcome.FAILED, message=document.error_message)
+
+    if document.status != Document.Status.FAILED:
+        safe_index_document(document)        # searchable before the document shows as finished
 
     document.processing_time_ms = int((time.perf_counter() - started) * 1000)
     document.processed_at = timezone.now()

@@ -8,6 +8,7 @@ from .extraction.crosscheck import clear_cross_checks, cross_verify_document
 from .extraction.numbers import make_dedupe_key
 from .extraction.service import final_status
 from .extraction.validation import validate_result
+from .search.indexer import safe_index_result
 from .models import CorrectionLog, Document, ExtractionResult, LineItem, ValidationIssue
 
 SCALAR_FIELDS = ("invoice_number", "invoice_date", "supplier_name", "customer_name",
@@ -104,6 +105,7 @@ def apply_correction(result: ExtractionResult, data: dict, note: str = "") -> li
     result.save()
     CorrectionLog.objects.bulk_create(logs)
     revalidate(result)
+    transaction.on_commit(lambda: safe_index_result(result))
     return logs
 
 

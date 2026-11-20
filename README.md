@@ -7,7 +7,7 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phases 1-4 (foundation, document processing, AI extraction and validation, REST API with background jobs) are complete. See the roadmap below.
+> Phases 1-5 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search) are complete. See the roadmap below.
 
 ## Roadmap
 
@@ -17,7 +17,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 | 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Done |
 | 3 | AI extraction, validation, cross-verification | Done |
 | 4 | REST API and background jobs | Done |
-| 5 | Keyword and semantic search | Planned |
+| 5 | Keyword and semantic search | Done |
 | 6 | React frontend | Planned |
 | 7 | Tests and evaluation | Planned |
 | 8 | Documentation and final delivery | Planned |
@@ -26,8 +26,9 @@ cross-verifies documents, and makes everything searchable through an API and web
 
 - **Backend:** Python, Django, Django REST Framework
 - **Background jobs:** Celery + Redis
-- **Database:** PostgreSQL with pgvector (SQLite for no-Docker local mode)
+- **Database:** PostgreSQL (SQLite for no-Docker local mode)
 - **Document processing:** PyMuPDF (PDF), RapidOCR (OCR, runs locally on CPU), openpyxl / xlrd / csv (spreadsheets)
+- **Search:** keyword + semantic (local `fastembed` embeddings, no API key) + hybrid ranking
 - **LLM:** Groq API (OpenAI-compatible, JSON mode); rule-based fallback when unavailable
 - **Frontend:** React, Vite, TypeScript, Tailwind CSS (Phase 6)
 
@@ -97,6 +98,16 @@ curl -H "Authorization: Token $TOKEN" -F files=@invoice.pdf http://localhost:800
 curl -H "Authorization: Token $TOKEN" http://localhost:8000/api/documents/            # list
 ```
 
+## Search
+
+```bash
+curl -H "Authorization: Token $TOKEN" "http://localhost:8000/api/search/?q=acme+invoice&mode=hybrid"
+python manage.py reindex_search        # rebuild the index (e.g. after changing the embedding model)
+```
+
+The first semantic search/indexing downloads a small embedding model (~130 MB). Without internet access the app
+falls back to a built-in embedder automatically. See [docs/SEARCH.md](docs/SEARCH.md).
+
 ## Try the pipeline from the command line
 
 Run any PDF, image, Excel or CSV file through the full pipeline (OCR, AI extraction, validation,
@@ -121,6 +132,7 @@ Process an invoice PDF and an Excel register containing the same invoice to see 
 ## Documentation
 
 - [REST API](docs/API.md)
+- [Search](docs/SEARCH.md)
 - [Database schema](docs/DATABASE_SCHEMA.md)
 - [Document processing pipelines](docs/PROCESSING.md)
 - [AI extraction, validation and cross-verification](docs/EXTRACTION.md)

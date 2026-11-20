@@ -11,6 +11,7 @@ urlpatterns = [
     path("health/", views.health, name="health"),
     path("auth/token/", views.LoginView.as_view(), name="login"),
     path("auth/me/", views.MeView.as_view(), name="me"),
+    path("search/", views.SearchView.as_view(), name="search"),
     path("stats/", views.StatsView.as_view(), name="stats"),
     path("issues/<int:pk>/resolve/", views.ResolveIssueView.as_view(), name="issue-resolve"),
     path("", include(router.urls)),

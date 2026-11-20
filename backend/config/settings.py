@@ -4,6 +4,7 @@ All environment-specific values come from environment variables (see
 ``.env.example``). No secret is ever hard-coded here.
 """
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -154,6 +155,7 @@ REST_FRAMEWORK = {
         "uploads": "200/hour",     # upload requests
         "reprocess": "60/hour",
         "poll": "6000/hour",       # status polling by the UI
+        "search": "1200/hour",
     },
     "DEFAULT_PAGINATION_CLASS": "documents.pagination.StandardPagination",
     "PAGE_SIZE": 25,
@@ -186,3 +188,13 @@ if not DEBUG and env_bool("DJANGO_SECURE_SSL", False):
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
+
+# --- Search (Phase 5) -----------------------------------------------------
+EMBEDDING_BACKEND = os.environ.get("EMBEDDING_BACKEND", "auto")          # auto | fastembed | hashing
+if "test" in sys.argv[1:2]:
+    EMBEDDING_BACKEND = "hashing"      # tests must be offline and fast
+EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
+EMBEDDING_CACHE_DIR = os.environ.get("EMBEDDING_CACHE_DIR", str(BASE_DIR / ".cache" / "fastembed"))
+EMBED_MAX_PAGES = int(os.environ.get("EMBED_MAX_PAGES", "3000"))          # pages indexed per document
+SEMANTIC_MIN_SCORE = float(os.environ.get("SEMANTIC_MIN_SCORE", "0.30"))   # cosine similarity floor
+SEMANTIC_MAX_CANDIDATES = int(os.environ.get("SEMANTIC_MAX_CANDIDATES", "50000"))

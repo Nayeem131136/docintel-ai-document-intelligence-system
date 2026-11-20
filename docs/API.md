@@ -44,6 +44,8 @@ Every user sees only their own documents (404 for anything else). Staff see all.
 | PATCH | `/results/{id}/` | Manual correction (re-validates, re-runs cross-checks, writes audit log) |
 | POST | `/results/{id}/approve/` | Mark the invoice as reviewed and resolve its issues |
 | POST | `/issues/{id}/resolve/` | Resolve one validation issue |
+| GET | `/results/` | List invoices. Filters: `q`, `supplier`, `customer`, `invoice_number`, `currency`, `review_status`, `has_issues`, `date_from`, `date_to`, `min_total`, `max_total`, `document`, `ordering` |
+| GET | `/search/` | Keyword / semantic / hybrid search (see below) |
 | GET | `/stats/` | Counts by status, success rate, invoice totals |
 
 ## Examples
@@ -69,6 +71,16 @@ Upload response (partial success is allowed):
 {"documents": [{"id": "...", "status": "queued", "...": "..."}],
  "rejected": [{"filename": "notes.docx", "error": "Unsupported file type ..."}]}
 ```
+
+## Search
+
+```bash
+curl -H "Authorization: Token $TOKEN" "http://localhost:8000/api/search/?q=printing+services&mode=hybrid&currency=EUR"
+```
+
+`mode` = `hybrid` (default) | `keyword` | `semantic`; `limit` up to 100. Each result has `kind`
+(`invoice` or `page`), `score`, `snippet`, `document`, `page_number` and, for invoices, the invoice summary.
+Details: [SEARCH.md](SEARCH.md).
 
 ## Status codes
 

@@ -6,6 +6,8 @@ import re
 
 from django.conf import settings
 from django.db import connection, transaction
+from decimal import Decimal, InvalidOperation
+
 from django.db.models import Avg, Count, Q
 from django.http import FileResponse
 from rest_framework import mixins, status as http, viewsets
@@ -13,7 +15,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.decorators import action, api_view, authentication_classes, permission_classes, throttle_classes
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -21,7 +23,8 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from . import corrections
-from .models import Document, ExtractionResult, ProcessingEvent, ValidationIssue
+from .models import Document, ExtractionResult, ProcessingEvent, SearchChunk, ValidationIssue
+from .search import query as search_query
 from .processing import ProcessingError
 from .processing.detect import detect_upload_type
 from .serializers import (CrossCheckSerializer, DocumentSerializer, EventSerializer, IssueSerializer,
@@ -55,6 +58,40 @@ def clean_filename(name: str) -> str:
     name = re.sub(r"\s+", " ", name) or "upload"
     stem, ext = os.path.splitext(name)
     return stem[: 255 - len(ext)] + ext
+
+
+def parse_invoice_filters(params) -> dict:
+    """Validate the invoice filters shared by the invoice list and the search endpoint."""
+    filters, errors = {}, {}
+    for key in ("supplier", "customer", "currency", "review_status", "file_type", "kind", "document"):
+        if params.get(key):
+            filters[key] = params[key].strip()
+    if filters.get("review_status") and filters["review_status"] not in ("ok", "needs_review", "reviewed"):
+        errors["review_status"] = "Use ok, needs_review or reviewed."
+    if filters.get("kind") and filters["kind"] not in ("invoice", "page"):
+        errors["kind"] = "Use invoice or page."
+    for key in ("date_from", "date_to"):
+        if params.get(key):
+            parsed = search_query.parse_date(params[key])
+            if parsed is None:
+                errors[key] = "Use YYYY-MM-DD."
+            else:
+                filters[key] = parsed
+    for key in ("min_total", "max_total"):
+        if params.get(key):
+            try:
+                filters[key] = Decimal(params[key])
+            except InvalidOperation:
+                errors[key] = "Must be a number."
+    if filters.get("document"):
+        try:
+            import uuid
+            uuid.UUID(filters["document"])
+        except ValueError:
+            errors["document"] = "Must be a document id."
+    if errors:
+        raise ValidationError(errors)
+    return filters
 
 
 # --------------------------------------------------------------------------- health & auth
@@ -264,12 +301,39 @@ class DocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.D
 
 
 # --------------------------------------------------------------------------- results & issues
-class ResultViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class ResultViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """Extracted invoices. The list supports filtering; PATCH/approve are the review actions."""
     serializer_class = ResultSerializer
     http_method_names = ["get", "patch", "post", "head", "options"]
+    ORDERINGS = {"invoice_date", "total", "created_at", "supplier_name", "invoice_number"}
+
+    def get_serializer_class(self):
+        return ResultSummarySerializer if self.action == "list" else ResultSerializer
 
     def get_queryset(self):
-        return visible_results(self.request.user).prefetch_related("line_items", "issues", "corrections")
+        queryset = visible_results(self.request.user)
+        if self.action != "list":
+            return queryset.prefetch_related("line_items", "issues", "corrections")
+        params = self.request.query_params
+        filters = parse_invoice_filters(params)
+        queryset = queryset.annotate(open_issues=Count(
+            "issues", filter=Q(issues__resolved=False, issues__severity__in=("error", "warning")), distinct=True))
+        if value := params.get("q"):
+            queryset = queryset.filter(Q(invoice_number__icontains=value) | Q(supplier_name__icontains=value)
+                                       | Q(customer_name__icontains=value))
+        if value := params.get("invoice_number"):
+            queryset = queryset.filter(invoice_number__icontains=value)
+        mapping = {"supplier": "supplier_name__icontains", "customer": "customer_name__icontains",
+                   "currency": "currency__iexact", "review_status": "review_status",
+                   "date_from": "invoice_date__gte", "date_to": "invoice_date__lte",
+                   "min_total": "total__gte", "max_total": "total__lte", "document": "document_id"}
+        queryset = queryset.filter(**{mapping[k]: v for k, v in filters.items() if k in mapping})
+        if params.get("has_issues") in ("1", "true"):
+            queryset = queryset.filter(open_issues__gt=0)
+        ordering = params.get("ordering", "-created_at")
+        if ordering.lstrip("-") in self.ORDERINGS:
+            return queryset.order_by(ordering, "-id")
+        return queryset.order_by("-created_at", "-id")
 
     def partial_update(self, request, *args, **kwargs):
         result = self.get_object()
@@ -331,3 +395,50 @@ class StatsView(APIView):
                          "needs_review": results.filter(review_status="needs_review").count()},
             "open_issues": open_issues.count(),
         })
+
+
+class SearchView(APIView):
+    """GET /api/search/?q=acme&mode=hybrid|keyword|semantic
+
+    Searches the signed-in user's own invoices and page text. Optional filters: kind, file_type, document,
+    supplier, customer, currency, review_status, date_from, date_to, min_total, max_total.
+    """
+    throttle_scope = "search"
+
+    def get(self, request):
+        query = (request.query_params.get("q") or "").strip()
+        if len(query) < 2:
+            raise ValidationError({"q": "Type at least 2 characters."})
+        if len(query) > 300:
+            raise ValidationError({"q": "Query is too long (max 300 characters)."})
+        mode = request.query_params.get("mode", "hybrid")
+        if mode not in ("hybrid", "keyword", "semantic"):
+            raise ValidationError({"mode": "Use hybrid, keyword or semantic."})
+        try:
+            limit = max(1, min(int(request.query_params.get("limit", 20)), 100))
+        except ValueError:
+            raise ValidationError({"limit": "Must be a number."})
+        filters = parse_invoice_filters(request.query_params)
+
+        base = SearchChunk.objects.filter(document__in=visible_documents(request.user))
+        outcome = search_query.search(base, query, mode, limit, filters)
+        results = []
+        for hit in outcome["hits"]:
+            chunk, result = hit.chunk, hit.chunk.result
+            item = {
+                "kind": chunk.kind, "score": round(hit.score, 4),
+                "keyword_score": None if hit.keyword_score is None else round(hit.keyword_score, 3),
+                "semantic_score": None if hit.semantic_score is None else round(hit.semantic_score, 3),
+                "document": {"id": str(chunk.document_id), "filename": chunk.document.original_filename,
+                             "file_type": chunk.document.file_type, "status": chunk.document.status},
+                "page_number": chunk.page_number,
+                "snippet": search_query.snippet(chunk.text, outcome["terms"]),
+            }
+            if result is not None:
+                item["invoice"] = {"id": result.pk, "invoice_number": result.invoice_number,
+                                   "supplier_name": result.supplier_name, "customer_name": result.customer_name,
+                                   "invoice_date": result.invoice_date, "total": result.total,
+                                   "currency": result.currency, "review_status": result.review_status}
+            results.append(item)
+        return Response({"query": query, "mode": mode, "terms": outcome["terms"],
+                         "semantic_model": outcome["semantic_model"], "count": len(results), "results": results})

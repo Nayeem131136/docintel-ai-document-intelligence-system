@@ -17,7 +17,7 @@ COPY . .
 RUN DJANGO_DEBUG=true DJANGO_SECRET_KEY=build-only-placeholder python manage.py collectstatic --noinput
 
 # Run as a non-root user (security)
-RUN useradd -m appuser && mkdir -p /app/media && chown -R appuser /app
+RUN useradd -m appuser && mkdir -p /app/media /app/.cache/fastembed && chown -R appuser /app
 USER appuser
 
 EXPOSE 8000

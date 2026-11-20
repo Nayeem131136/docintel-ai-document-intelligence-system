@@ -37,7 +37,7 @@ class ApiTestCase(APITestCase):
         cache.clear()                                        # throttle counters live in the cache
         self.tmp = Path(tempfile.mkdtemp())
         media = tempfile.mkdtemp()
-        for override in (override_settings(MEDIA_ROOT=media, GROQ_API_KEY="", GROQ_MODEL=""),):
+        for override in (override_settings(MEDIA_ROOT=media, GROQ_API_KEY="", GROQ_MODEL="", EMBEDDING_BACKEND="hashing"),):
             override.enable()
             self.addCleanup(override.disable)
         previous = (celery_app.conf.task_always_eager, celery_app.conf.task_eager_propagates)
