@@ -481,7 +481,7 @@ class ValidationTests(TestCase):
         self.assertIn(("LINE_ITEM_MISMATCH", "error"), self.codes(self.make(items=[(2, 50, 110), (1, 65, 65)])))
 
     def test_total_without_tax_must_equal_subtotal(self):
-        self.assertIn(("TOTAL_MISMATCH", "warning"), self.codes(self.make(tax=None, total=Decimal("190.00"))))
+        self.assertIn(("TOTAL_MISMATCH", "error"), self.codes(self.make(tax=None, total=Decimal("190.00"))))
         self.assertNotIn("TOTAL_MISMATCH", [c for c, _ in self.codes(self.make(tax=None, total=Decimal("175.00")))])
 
     def test_lines_are_used_when_subtotal_is_missing(self):
@@ -593,7 +593,7 @@ class EndToEndTests(MediaTestCase):
         self.assertEqual(result.method, "llm")
         self.assertEqual(result.model_name, "fake-model")
         self.assertEqual(result.confidence["invoice_number"], 0.99)
-        self.assertEqual(result.raw_output["prompt_version"], "extract-v1")
+        self.assertEqual(result.raw_output["prompt_version"], "extract-v2")
         self.assertEqual(len(llm.calls), 1)
         self.assertIn("INV-1001", llm.calls[0][1])
         self.assertEqual(document.status, Document.Status.COMPLETED)

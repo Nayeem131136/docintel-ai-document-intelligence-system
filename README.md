@@ -7,7 +7,7 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phases 1-5 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search) are complete. See the roadmap below.
+> Phases 1-6 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search, React web app) are complete. See the roadmap below.
 
 ## Roadmap
 
@@ -18,7 +18,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 | 3 | AI extraction, validation, cross-verification | Done |
 | 4 | REST API and background jobs | Done |
 | 5 | Keyword and semantic search | Done |
-| 6 | React frontend | Planned |
+| 6 | React frontend | Done |
 | 7 | Tests and evaluation | Planned |
 | 8 | Documentation and final delivery | Planned |
 
@@ -30,7 +30,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 - **Document processing:** PyMuPDF (PDF), RapidOCR (OCR, runs locally on CPU), openpyxl / xlrd / csv (spreadsheets)
 - **Search:** keyword + semantic (local `fastembed` embeddings, no API key) + hybrid ranking
 - **LLM:** Groq API (OpenAI-compatible, JSON mode); rule-based fallback when unavailable
-- **Frontend:** React, Vite, TypeScript, Tailwind CSS (Phase 6)
+- **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, TanStack Query, Vitest
 
 ## Setup
 
@@ -43,7 +43,7 @@ cp .env.example .env        # Windows PowerShell: copy .env.example .env
 docker compose up --build
 ```
 
-Then open http://localhost:8000/api/health/ - expected:
+Then open the web app at http://localhost:3000 (API health: http://localhost:8000/api/health/ - expected):
 
 ```json
 {"status": "ok", "service": "docintel-api", "database": "ok", "debug": true}
@@ -69,6 +69,25 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+### Web app (frontend)
+
+Docker mode already serves it at http://localhost:3000. For local development (needs Node 20+):
+
+```bash
+cd frontend
+npm install
+npm run dev            # http://localhost:5173 - forwards /api to http://localhost:8000
+```
+
+Create a login first: `python manage.py create_api_user alice` (run inside `backend/`, or via
+`docker compose exec api python manage.py create_api_user alice`). Without Redis, set
+`CELERY_TASK_ALWAYS_EAGER=true` in `.env` so uploads are processed immediately.
+
+Features: sign in, multi-file drag-and-drop upload with per-file progress, live processing status,
+invoice review with validation issues, inline correction (audit trail), manual invoice entry,
+PDF-vs-PDF / PDF-vs-Excel cross-check view, original file preview, extracted text per page,
+invoice list with filters, and keyword / semantic / hybrid search.
+
 ### Run the tests
 
 ```bash
@@ -76,6 +95,8 @@ cd backend
 pip install -r requirements-dev.txt     # adds xlwt, used to build .xls test files
 python manage.py test
 ```
+
+Frontend tests and production build: `cd frontend && npm test && npm run build`.
 
 Inside Docker: `docker compose exec api python manage.py test` (the XLS test is skipped there
 because test-only packages are not installed in the image).
@@ -131,6 +152,7 @@ Process an invoice PDF and an Excel register containing the same invoice to see 
 
 ## Documentation
 
+- [Web app](docs/FRONTEND.md)
 - [REST API](docs/API.md)
 - [Search](docs/SEARCH.md)
 - [Database schema](docs/DATABASE_SCHEMA.md)

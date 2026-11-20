@@ -1,3 +1,4 @@
+
 """Extract one invoice from one segment of text: LLM first, rules as the fallback."""
 import logging
 from datetime import date
@@ -33,36 +34,66 @@ def draft_from_llm_json(data: dict, model_name: str) -> Draft:
 
     number = data.get("invoice_number")
     draft.invoice_number = clean_name(number) if isinstance(number, (str, int)) else None
+
     for name in ("supplier_name", "customer_name"):
         value = data.get(name)
         setattr(draft, name, clean_name(value) if isinstance(value, str) else None)
+
     currency = data.get("currency")
-    draft.currency = currency.strip().upper() if isinstance(currency, str) and len(currency.strip()) == 3 else None
+    draft.currency = (
+        currency.strip().upper()
+        if isinstance(currency, str) and len(currency.strip()) == 3
+        else None
+    )
 
     raw_date = data.get("invoice_date")
     draft.invoice_date = parse_date(raw_date) if isinstance(raw_date, (str, date)) else None
+
     if raw_date and draft.invoice_date is None:
         code = "AMBIGUOUS_DATE" if is_ambiguous_date(raw_date) else "INVALID_DATE"
-        draft.notes.append(Note(code, f"Date '{raw_date}' could not be read unambiguously; left empty.",
-                                "warning", "invoice_date"))
-    for name in ("subtotal", "tax", "total"):
+        draft.notes.append(
+            Note(
+                code,
+                f"Date '{raw_date}' could not be read unambiguously; left empty.",
+                "warning",
+                "invoice_date",
+            )
+        )
+
+    for name in ("subtotal", "discount", "tax", "total"):
         value = data.get(name)
         amount = parse_amount(value)
+
+        # A discount reduces the payable amount, so store it as negative.
+        if name == "discount" and amount is not None:
+            amount = -abs(amount)
+
         setattr(draft, name, amount)
+
         if value is not None and amount is None:
-            draft.notes.append(Note("INVALID_NUMBER", f"{name} '{value}' is not a number; left empty.", "warning", name))
+            draft.notes.append(
+                Note(
+                    "INVALID_NUMBER",
+                    f"{name} '{value}' is not a number; left empty.",
+                    "warning",
+                    name,
+                )
+            )
 
     items = data.get("line_items")
     for item in items if isinstance(items, list) else []:
         if not isinstance(item, dict):
             continue
+
         description = item.get("description")
-        draft.line_items.append({
-            "description": clean_name(description) if isinstance(description, str) else None,
-            "quantity": parse_amount(item.get("quantity")),
-            "unit_price": parse_amount(item.get("unit_price")),
-            "amount": parse_amount(item.get("amount")),
-        })
+        draft.line_items.append(
+            {
+                "description": clean_name(description) if isinstance(description, str) else None,
+                "quantity": parse_amount(item.get("quantity")),
+                "unit_price": parse_amount(item.get("unit_price")),
+                "amount": parse_amount(item.get("amount")),
+            }
+        )
 
     confidence = data.get("confidence")
     if isinstance(confidence, dict):
@@ -70,6 +101,7 @@ def draft_from_llm_json(data: dict, model_name: str) -> Draft:
             value = _clamp(confidence.get(name))
             if value is not None and getattr(draft, name) is not None:
                 draft.confidence[name] = value
+
     return draft
 
 
@@ -77,26 +109,46 @@ def extract_segment(text: str, llm, *, page_start: int, page_end: int) -> Draft:
     """Return a grounded Draft. ``llm`` may be None (rules only)."""
     notes: list[Note] = []
     source = text
+
     if len(text) > max_chars():
         text = text[: max_chars()]
-        notes.append(Note("TEXT_TRUNCATED", f"The invoice text was longer than {max_chars()} characters; "
-                          "only the beginning was analysed.", "warning"))
+        notes.append(
+            Note(
+                "TEXT_TRUNCATED",
+                f"The invoice text was longer than {max_chars()} characters; "
+                "only the beginning was analysed.",
+                "warning",
+            )
+        )
 
     draft: Draft | None = None
+
     if llm is not None:
         try:
             data = llm.complete_json(SYSTEM_PROMPT, build_user_prompt(text))
             draft = draft_from_llm_json(data, getattr(llm, "model", ""))
         except LLMError as exc:
             logger.warning("LLM extraction failed, using rules: %s", exc)
-            notes.append(Note("EXTRACTION_FALLBACK",
-                              f"AI extraction failed ({exc}); rule-based extraction was used instead.", "warning"))
+            notes.append(
+                Note(
+                    "EXTRACTION_FALLBACK",
+                    f"AI extraction failed ({exc}); rule-based extraction was used instead.",
+                    "warning",
+                )
+            )
+
     if draft is None:
         draft = extract_with_rules(text)
         if llm is None:
-            notes.append(Note("EXTRACTION_FALLBACK",
-                              "No LLM is configured; rule-based extraction was used. Check every field.", "info"))
+            notes.append(
+                Note(
+                    "EXTRACTION_FALLBACK",
+                    "No LLM is configured; rule-based extraction was used. Check every field.",
+                    "info",
+                )
+            )
 
     draft.page_start, draft.page_end = page_start, page_end
     draft.notes.extend(notes)
+
     return ground_draft(draft, source)

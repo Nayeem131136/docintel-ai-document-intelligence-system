@@ -1,4 +1,4 @@
-# DocIntel - production-like stack: PostgreSQL (+pgvector), Redis, API, Celery worker.
+# DocIntel - production-like stack: PostgreSQL, Redis, API, Celery worker, web frontend.
 # Usage:  cp .env.example .env   then   docker compose up --build
 
 services:
@@ -59,6 +59,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"            # web app: http://localhost:3000  (nginx also proxies /api to the api service)
+    depends_on:
+      - api
 
 volumes:
   pgdata:
