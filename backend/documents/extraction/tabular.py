@@ -10,9 +10,12 @@ HEADER_SYNONYMS = {
     "invoice_number": {
         "invoice no", "invoice number", "invoice", "inv no",
         "inv number", "invoice id", "bill no", "invoice num", "invoice nr",
+        "inv", "inv nr", "inv num", "invoice ref", "invoice reference",
+        "document no", "document number",
     },
     "invoice_date": {
         "invoice date", "date", "issue date", "bill date", "date of issue",
+        "inv date", "date issued", "issued",
     },
     "supplier_name": {
         "supplier", "supplier name", "vendor", "vendor name", "seller", "from",
@@ -33,8 +36,9 @@ HEADER_SYNONYMS = {
     "total": {
         "total", "grand total", "total amount", "amount",
         "invoice total", "gross", "amount due",
+        "gross total", "gross amount", "invoice amount",
     },
-    "currency": {"currency", "ccy"},
+    "currency": {"currency", "ccy", "curr", "cur", "currency code"},
 }
 
 SEARCH_ROWS = 10

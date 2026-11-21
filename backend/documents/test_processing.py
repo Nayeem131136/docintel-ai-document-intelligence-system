@@ -1,4 +1,4 @@
-"""Tests for the Phase 2 document-processing pipelines.
+"""Tests for the document-processing pipelines.
 
 All fixtures are generated in code (no binary files are committed): digital PDFs with
 PyMuPDF, scanned PDFs / images by drawing text with Pillow, spreadsheets with

@@ -1,7 +1,7 @@
 """The complete pipeline for one document:
 text extraction / OCR  ->  AI extraction  ->  validation  ->  cross-verification.
 
-Phase 4 runs ``process_document`` inside a Celery task.
+The API runs ``process_document`` inside a Celery task.
 """
 import logging
 import time

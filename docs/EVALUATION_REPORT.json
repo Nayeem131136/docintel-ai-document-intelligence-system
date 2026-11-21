@@ -1,0 +1,2615 @@
+{
+  "run": {
+    "date": "2026-11-21 16:52 UTC",
+    "mode": "LLM (openai/gpt-oss-120b)",
+    "embedder": "BAAI/bge-small-en-v1.5",
+    "python": "3.12.16",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "cpus": 12,
+    "dataset": {
+      "seed": 42,
+      "scale": 1.0,
+      "files": 67,
+      "invoices": 116,
+      "note": "Synthetic data with fictional companies. Ground truth is exact by construction."
+    },
+    "stress_llm": false
+  },
+  "extraction": {
+    "fields": {
+      "invoice_number": {
+        "correct": 112,
+        "wrong": 4,
+        "missing": 0,
+        "spurious": 0,
+        "precision": 0.9655172413793104,
+        "recall": 0.9655172413793104,
+        "f1": 0.9655172413793104
+      },
+      "invoice_date": {
+        "correct": 110,
+        "wrong": 0,
+        "missing": 4,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9649122807017544,
+        "f1": 0.9821428571428572
+      },
+      "supplier_name": {
+        "correct": 114,
+        "wrong": 2,
+        "missing": 0,
+        "spurious": 0,
+        "precision": 0.9827586206896551,
+        "recall": 0.9827586206896551,
+        "f1": 0.9827586206896551
+      },
+      "customer_name": {
+        "correct": 115,
+        "wrong": 1,
+        "missing": 0,
+        "spurious": 0,
+        "precision": 0.9913793103448276,
+        "recall": 0.9913793103448276,
+        "f1": 0.9913793103448276
+      },
+      "currency": {
+        "correct": 114,
+        "wrong": 0,
+        "missing": 2,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9827586206896551,
+        "f1": 0.9913043478260869
+      },
+      "subtotal": {
+        "correct": 115,
+        "wrong": 0,
+        "missing": 1,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9913793103448276,
+        "f1": 0.9956709956709957
+      },
+      "discount": {
+        "correct": 66,
+        "wrong": 0,
+        "missing": 1,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9850746268656716,
+        "f1": 0.9924812030075187
+      },
+      "tax": {
+        "correct": 114,
+        "wrong": 0,
+        "missing": 2,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9827586206896551,
+        "f1": 0.9913043478260869
+      },
+      "total": {
+        "correct": 115,
+        "wrong": 0,
+        "missing": 1,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 0.9913793103448276,
+        "f1": 0.9956709956709957
+      }
+    },
+    "overall": {
+      "correct": 975,
+      "wrong": 7,
+      "missing": 11,
+      "spurious": 0,
+      "precision": 0.9928716904276986,
+      "recall": 0.9818731117824774,
+      "f1": 0.9873417721518989,
+      "hallucination_rate": 0.007128309572301426,
+      "field_accuracy": 0.9827586206896551
+    },
+    "by_condition": {
+      "digital": {
+        "invoices": 47,
+        "fully_correct": 47,
+        "field_accuracy": 1.0,
+        "correct": 401,
+        "wrong": 0,
+        "missing": 0,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      "scan": {
+        "invoices": 13,
+        "fully_correct": 7,
+        "field_accuracy": 0.8974358974358975,
+        "correct": 97,
+        "wrong": 3,
+        "missing": 9,
+        "spurious": 0,
+        "precision": 0.97,
+        "recall": 0.8899082568807339,
+        "f1": 0.9282296650717704
+      },
+      "photo": {
+        "invoices": 4,
+        "fully_correct": 0,
+        "field_accuracy": 0.8333333333333334,
+        "correct": 28,
+        "wrong": 4,
+        "missing": 2,
+        "spurious": 0,
+        "precision": 0.875,
+        "recall": 0.8235294117647058,
+        "f1": 0.8484848484848485
+      },
+      "sheet": {
+        "invoices": 52,
+        "fully_correct": 52,
+        "field_accuracy": 1.0,
+        "correct": 449,
+        "wrong": 0,
+        "missing": 0,
+        "spurious": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      }
+    },
+    "invoice_detection": {
+      "truth": 116,
+      "found": 116,
+      "missed": 0,
+      "extra": 0,
+      "recall": 1.0,
+      "precision": 1.0
+    },
+    "fully_correct_invoices": 106,
+    "invoices_scored": 116,
+    "line_item_count_accuracy": 0.984375,
+    "line_item_invoices": 64,
+    "errors": [
+      {
+        "file": "020_scanned.pdf",
+        "field": "invoice_number",
+        "outcome": "wrong",
+        "expected": "SI/1422",
+        "got": "Sl/1422"
+      },
+      {
+        "file": "020_scanned.pdf",
+        "field": "subtotal",
+        "outcome": "missing",
+        "expected": "32131.70",
+        "got": null
+      },
+      {
+        "file": "020_scanned.pdf",
+        "field": "discount",
+        "outcome": "missing",
+        "expected": "-3213.17",
+        "got": null
+      },
+      {
+        "file": "020_scanned.pdf",
+        "field": "tax",
+        "outcome": "missing",
+        "expected": "3213.17",
+        "got": null
+      },
+      {
+        "file": "020_scanned.pdf",
+        "field": "total",
+        "outcome": "missing",
+        "expected": "32131.70",
+        "got": null
+      },
+      {
+        "file": "024_scanned.pdf",
+        "field": "invoice_date",
+        "outcome": "missing",
+        "expected": "2025-06-19",
+        "got": null
+      },
+      {
+        "file": "024_scanned.pdf",
+        "field": "currency",
+        "outcome": "missing",
+        "expected": "USD",
+        "got": null
+      },
+      {
+        "file": "027_image.png",
+        "field": "tax",
+        "outcome": "missing",
+        "expected": "0.00",
+        "got": null
+      },
+      {
+        "file": "030_photo.jpg",
+        "field": "supplier_name",
+        "outcome": "wrong",
+        "expected": "Meridian Software Corp",
+        "got": "Meridlian Software Corp"
+      },
+      {
+        "file": "031_photo.jpg",
+        "field": "invoice_number",
+        "outcome": "wrong",
+        "expected": "A001659",
+        "got": "InvoiceA001659"
+      },
+      {
+        "file": "031_photo.jpg",
+        "field": "invoice_date",
+        "outcome": "missing",
+        "expected": "2025-04-11",
+        "got": null
+      },
+      {
+        "file": "032_photo.jpg",
+        "field": "customer_name",
+        "outcome": "wrong",
+        "expected": "Hooli Systems",
+        "got": "Hool Systems"
+      },
+      {
+        "file": "033_photo.jpg",
+        "field": "invoice_number",
+        "outcome": "wrong",
+        "expected": "SI/1673",
+        "got": "Invoices/1673"
+      },
+      {
+        "file": "033_photo.jpg",
+        "field": "invoice_date",
+        "outcome": "missing",
+        "expected": "2025-01-02",
+        "got": null
+      },
+      {
+        "file": "034_multipage.tiff",
+        "field": "invoice_date",
+        "outcome": "missing",
+        "expected": "2025-08-24",
+        "got": null
+      },
+      {
+        "file": "034_multipage.tiff",
+        "field": "invoice_number",
+        "outcome": "wrong",
+        "expected": "SI/1728",
+        "got": "Sl/1728"
+      },
+      {
+        "file": "034_multipage.tiff",
+        "field": "supplier_name",
+        "outcome": "wrong",
+        "expected": "Riverbend Paper Mills",
+        "got": "Rlverbend Paper Mills"
+      },
+      {
+        "file": "053_scanned.pdf",
+        "field": "currency",
+        "outcome": "missing",
+        "expected": "GBP",
+        "got": null
+      }
+    ]
+  },
+  "validation": {
+    "per_code": {
+      "CROSS_CHECK_MISMATCH": {
+        "expected": 3,
+        "detected": 3
+      },
+      "DUPLICATE_FILE": {
+        "expected": 2,
+        "detected": 2
+      },
+      "DUPLICATE_INVOICE": {
+        "expected": 4,
+        "detected": 4
+      },
+      "MISSING_FIELD": {
+        "expected": 2,
+        "detected": 2
+      },
+      "TOTAL_MISMATCH": {
+        "expected": 6,
+        "detected": 6
+      }
+    },
+    "detection_rate": 1.0,
+    "expected_total": 17,
+    "detected_total": 17,
+    "clean_files": 54,
+    "clean_files_with_unexpected_alarm": 1,
+    "false_alarm_rate": 0.018518518518518517,
+    "unexpected_codes": {
+      "LINE_ITEM_MISMATCH": 1
+    },
+    "explained_alarms": 14,
+    "missed": []
+  },
+  "cross_checks": {
+    "pairs": 12,
+    "detected": 12,
+    "correct_outcome": 12,
+    "accuracy": 1.0,
+    "rows": [
+      {
+        "type": "pdf_pdf",
+        "invoice": "A002616",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_pdf",
+        "invoice": "A002625",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_pdf",
+        "invoice": "INV-2025-02632",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_pdf",
+        "invoice": "INV-2652",
+        "expected": "mismatch",
+        "got": "mismatch"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "INV-2689",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "INV-2709",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "A002782",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "A002791",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "INV-2875",
+        "expected": "mismatch",
+        "got": "mismatch"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "A002910",
+        "expected": "match",
+        "got": "match"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "SI/2973",
+        "expected": "mismatch",
+        "got": "mismatch"
+      },
+      {
+        "type": "pdf_excel",
+        "invoice": "A003002",
+        "expected": "match",
+        "got": "match"
+      }
+    ]
+  },
+  "search": {
+    "keyword": {
+      "invoice_number": {
+        "queries": 20,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "mrr": 1.0
+      },
+      "all": {
+        "queries": 54,
+        "hit_at_1": 0.5555555555555556,
+        "hit_at_5": 0.5555555555555556,
+        "mrr": 0.5555555555555556
+      },
+      "supplier": {
+        "queries": 10,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "mrr": 1.0
+      },
+      "item_paraphrase": {
+        "queries": 24,
+        "hit_at_1": 0.0,
+        "hit_at_5": 0.0,
+        "mrr": 0.0
+      }
+    },
+    "semantic": {
+      "invoice_number": {
+        "queries": 20,
+        "hit_at_1": 0.4,
+        "hit_at_5": 0.75,
+        "mrr": 0.5405555555555556
+      },
+      "all": {
+        "queries": 54,
+        "hit_at_1": 0.7222222222222222,
+        "hit_at_5": 0.9074074074074074,
+        "mrr": 0.8020576131687243
+      },
+      "supplier": {
+        "queries": 10,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "mrr": 1.0
+      },
+      "item_paraphrase": {
+        "queries": 24,
+        "hit_at_1": 0.875,
+        "hit_at_5": 1.0,
+        "mrr": 0.9375
+      }
+    },
+    "hybrid": {
+      "invoice_number": {
+        "queries": 20,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "mrr": 1.0
+      },
+      "all": {
+        "queries": 54,
+        "hit_at_1": 0.9444444444444444,
+        "hit_at_5": 1.0,
+        "mrr": 0.9722222222222222
+      },
+      "supplier": {
+        "queries": 10,
+        "hit_at_1": 1.0,
+        "hit_at_5": 1.0,
+        "mrr": 1.0
+      },
+      "item_paraphrase": {
+        "queries": 24,
+        "hit_at_1": 0.875,
+        "hit_at_5": 1.0,
+        "mrr": 0.9375
+      }
+    }
+  },
+  "search_queries": {
+    "invoice_number": 20,
+    "item_paraphrase": 24,
+    "supplier": 10
+  },
+  "performance": {
+    "by_kind": {
+      "csv_register": {
+        "files": 4,
+        "pages": 4,
+        "median_ms": 722.0,
+        "p95_ms": 1088,
+        "total_s": 2.944,
+        "failed": 0
+      },
+      "digital_pdf": {
+        "files": 43,
+        "pages": 51,
+        "median_ms": 8769,
+        "p95_ms": 26681,
+        "total_s": 417.08,
+        "failed": 0
+      },
+      "jpg_image": {
+        "files": 4,
+        "pages": 4,
+        "median_ms": 9907.5,
+        "p95_ms": 14849,
+        "total_s": 39.281,
+        "failed": 0
+      },
+      "png_image": {
+        "files": 4,
+        "pages": 4,
+        "median_ms": 8280.0,
+        "p95_ms": 9557,
+        "total_s": 32.959,
+        "failed": 0
+      },
+      "scanned_pdf": {
+        "files": 7,
+        "pages": 7,
+        "median_ms": 6720,
+        "p95_ms": 28746,
+        "total_s": 75.695,
+        "failed": 0
+      },
+      "tiff_image": {
+        "files": 1,
+        "pages": 2,
+        "median_ms": 24333,
+        "p95_ms": 24333,
+        "total_s": 24.333,
+        "failed": 0
+      },
+      "xlsx_register": {
+        "files": 4,
+        "pages": 4,
+        "median_ms": 748.0,
+        "p95_ms": 1102,
+        "total_s": 2.993,
+        "failed": 0
+      }
+    },
+    "statuses": {
+      "completed": 43,
+      "needs_review": 24
+    },
+    "failure_rate": 0.0
+  },
+  "stress": null,
+  "files": {
+    "001_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1028",
+          "invoice_date": "2024-01-31",
+          "supplier_name": "Omega Printing Co",
+          "customer_name": "Stark Manufacturing",
+          "currency": "EUR",
+          "subtotal": "4080.76",
+          "discount": "-408.08",
+          "tax": "204.04",
+          "total": "3876.72",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "002_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1051",
+          "invoice_date": "2024-02-14",
+          "supplier_name": "DELTA WAVE COMMUNICATIONS",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "USD",
+          "subtotal": "14853.10",
+          "discount": null,
+          "tax": "0.00",
+          "total": "14853.10",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "003_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1075",
+          "invoice_date": "2024-08-02",
+          "supplier_name": "Ironclad Industrial Supply",
+          "customer_name": "Wayne Holdings",
+          "currency": "EUR",
+          "subtotal": "17876.67",
+          "discount": "-1787.67",
+          "tax": "0.00",
+          "total": "16089.00",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "004_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001096",
+          "invoice_date": "2024-10-01",
+          "supplier_name": "Omega Printing Co",
+          "customer_name": "Stark Manufacturing",
+          "currency": "GBP",
+          "subtotal": "12400.93",
+          "discount": "-1860.14",
+          "tax": "1240.09",
+          "total": "11780.88",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "005_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001107",
+          "invoice_date": "2025-09-02",
+          "supplier_name": "OMEGA PRINTING CO",
+          "customer_name": "Vandelay Industries",
+          "currency": "EUR",
+          "subtotal": "25797.61",
+          "discount": "-2579.76",
+          "tax": "3869.64",
+          "total": "27087.49",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "006_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01135",
+          "invoice_date": "2025-04-09",
+          "supplier_name": "Acme Trading Ltd",
+          "customer_name": "Gringotts Finance",
+          "currency": "USD",
+          "subtotal": "13339.96",
+          "discount": "-1334.00",
+          "tax": "1334.00",
+          "total": "13339.96",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "007_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1137",
+          "invoice_date": "2025-01-06",
+          "supplier_name": "Evergreen Facilities Ltd",
+          "customer_name": "Stark Manufacturing",
+          "currency": "BDT",
+          "subtotal": "24586.94",
+          "discount": "-2458.69",
+          "tax": "0.00",
+          "total": "22128.25",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "008_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001146",
+          "invoice_date": "2025-07-16",
+          "supplier_name": "HARBOR POINT ELECTRONICS",
+          "customer_name": "Wayne Holdings",
+          "currency": "BDT",
+          "subtotal": "15068.46",
+          "discount": "-1506.85",
+          "tax": "2260.27",
+          "total": "15821.88",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "009_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01182",
+          "invoice_date": "2025-08-25",
+          "supplier_name": "Silverline Consulting",
+          "customer_name": "Globex Corporation",
+          "currency": "GBP",
+          "subtotal": "13368.36",
+          "discount": null,
+          "tax": "0.00",
+          "total": "13368.36",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "010_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001191",
+          "invoice_date": "2024-09-05",
+          "supplier_name": "Blue Orchid Catering",
+          "customer_name": "Pied Piper Media",
+          "currency": "USD",
+          "subtotal": "6854.01",
+          "discount": null,
+          "tax": "1028.10",
+          "total": "7882.11",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "011_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001209",
+          "invoice_date": "2024-09-12",
+          "supplier_name": "OMEGA PRINTING CO",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "USD",
+          "subtotal": "14391.79",
+          "discount": "-2158.77",
+          "tax": "0.00",
+          "total": "12233.02",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "012_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1235",
+          "invoice_date": "2024-06-17",
+          "supplier_name": "Redwood Furniture Co",
+          "customer_name": "Globex Corporation",
+          "currency": "BDT",
+          "subtotal": "5353.24",
+          "discount": "-267.66",
+          "tax": "802.99",
+          "total": "5888.57",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "013_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1268",
+          "invoice_date": "2024-07-09",
+          "supplier_name": "Omega Printing Co",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "USD",
+          "subtotal": "23815.86",
+          "discount": "-1190.79",
+          "tax": "0.00",
+          "total": "22625.07",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "014_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1282",
+          "invoice_date": "2024-09-01",
+          "supplier_name": "NORTHWIND HARDWARE",
+          "customer_name": "Vandelay Industries",
+          "currency": "USD",
+          "subtotal": "20531.48",
+          "discount": "-1026.57",
+          "tax": "1026.57",
+          "total": "20531.48",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "015_digital.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1296",
+          "invoice_date": "2024-05-15",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Massive Dynamic",
+          "currency": "USD",
+          "subtotal": "18254.68",
+          "discount": null,
+          "tax": "0.00",
+          "total": "18254.68",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "016_multi_invoice.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1310",
+          "invoice_date": "2024-07-27",
+          "supplier_name": "IRONCLAD INDUSTRIAL SUPPLY",
+          "customer_name": "Oscorp Pharma",
+          "currency": "USD",
+          "subtotal": "13424.37",
+          "discount": null,
+          "tax": "1342.44",
+          "total": "14766.81",
+          "item_count": 5,
+          "method": "llm"
+        },
+        {
+          "invoice_number": "SI/1319",
+          "invoice_date": "2024-06-14",
+          "supplier_name": "Delta Wave Communications",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "BDT",
+          "subtotal": "10478.12",
+          "discount": null,
+          "tax": "1571.72",
+          "total": "12049.84",
+          "item_count": 2,
+          "method": "llm"
+        },
+        {
+          "invoice_number": "SI/1322",
+          "invoice_date": "2024-08-03",
+          "supplier_name": "Ironclad Industrial Supply",
+          "customer_name": "Stark Manufacturing",
+          "currency": "USD",
+          "subtotal": "14471.13",
+          "discount": "-1447.11",
+          "tax": "0.00",
+          "total": "13024.02",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "017_multi_invoice.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1338",
+          "invoice_date": "2024-06-12",
+          "supplier_name": "Maple Leaf Imports",
+          "customer_name": "Initech Solutions",
+          "currency": "USD",
+          "subtotal": "18045.17",
+          "discount": "-902.26",
+          "tax": "2706.78",
+          "total": "19849.69",
+          "item_count": 3,
+          "method": "llm"
+        },
+        {
+          "invoice_number": "INV-1340",
+          "invoice_date": "2024-09-24",
+          "supplier_name": "Harbor Point Electronics",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "USD",
+          "subtotal": "24003.24",
+          "discount": null,
+          "tax": "2400.32",
+          "total": "26403.56",
+          "item_count": 5,
+          "method": "llm"
+        },
+        {
+          "invoice_number": "SI/1353",
+          "invoice_date": "2025-03-17",
+          "supplier_name": "OMEGA PRINTING CO",
+          "customer_name": "Oscorp Pharma",
+          "currency": "EUR",
+          "subtotal": "6475.33",
+          "discount": "-971.30",
+          "tax": "647.53",
+          "total": "6151.56",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "018_long_invoice.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1380",
+          "invoice_date": "2024-07-30",
+          "supplier_name": "Atlas Freight Partners",
+          "customer_name": "Vandelay Industries",
+          "currency": "USD",
+          "subtotal": "218397.69",
+          "discount": "-10919.88",
+          "tax": "0.00",
+          "total": "207477.81",
+          "item_count": 36,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "019_long_invoice.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01408",
+          "invoice_date": "2025-06-18",
+          "supplier_name": "Coral Bay Trading",
+          "customer_name": "Wayne Holdings",
+          "currency": "USD",
+          "subtotal": "147521.06",
+          "discount": "-7376.05",
+          "tax": "22128.16",
+          "total": "162273.17",
+          "item_count": 33,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "020_scanned.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "Sl/1422",
+          "invoice_date": "2024-09-21",
+          "supplier_name": "Pioneer Networks GmbH",
+          "customer_name": "Wayne Holdings",
+          "currency": "EUR",
+          "subtotal": null,
+          "discount": null,
+          "tax": null,
+          "total": null,
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD"
+      ],
+      "ocr_confidence": 0.9863359490951562
+    },
+    "021_scanned.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001446",
+          "invoice_date": "2025-07-20",
+          "supplier_name": "Summit Tools Ltd",
+          "customer_name": "Hooli Systems",
+          "currency": "EUR",
+          "subtotal": "19639.02",
+          "discount": null,
+          "tax": "2945.85",
+          "total": "22584.87",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9775291496372585
+    },
+    "022_scanned.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01458",
+          "invoice_date": "2024-08-09",
+          "supplier_name": "Delta Wave Communications",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "USD",
+          "subtotal": "16640.72",
+          "discount": null,
+          "tax": "1664.07",
+          "total": "18304.79",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.988062200876402
+    },
+    "023_scanned.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A001467",
+          "invoice_date": "2024-04-15",
+          "supplier_name": "ACME TRADING LTD",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "USD",
+          "subtotal": "2253.07",
+          "discount": "-112.65",
+          "tax": "225.31",
+          "total": "2365.73",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9850066382368742
+    },
+    "024_scanned.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01494",
+          "invoice_date": null,
+          "supplier_name": "REDWOODFURNITURECO",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": null,
+          "subtotal": "32016.78",
+          "discount": "-3201.68",
+          "tax": "4802.52",
+          "total": "33617.62",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD",
+        "UNGROUNDED_VALUE"
+      ],
+      "ocr_confidence": 0.9834242920832021
+    },
+    "025_scanned.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01499",
+          "invoice_date": "2024-01-03",
+          "supplier_name": "Atlas Freight Partners",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "EUR",
+          "subtotal": "2129.73",
+          "discount": null,
+          "tax": "319.46",
+          "total": "2449.19",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9833800920592893
+    },
+    "026_image.png": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A001518",
+          "invoice_date": "2024-05-07",
+          "supplier_name": "Meridian Software Corp",
+          "customer_name": "Gringotts Finance",
+          "currency": "GBP",
+          "subtotal": "18439.33",
+          "discount": null,
+          "tax": "1843.93",
+          "total": "20283.26",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "LINE_ITEM_MISMATCH"
+      ],
+      "ocr_confidence": 0.9840491513916921
+    },
+    "027_image.png": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1555",
+          "invoice_date": "2025-11-19",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "USD",
+          "subtotal": "5211.27",
+          "discount": "-260.56",
+          "tax": null,
+          "total": "4950.71",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9795109263851808
+    },
+    "028_image.png": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-1591",
+          "invoice_date": "2025-04-10",
+          "supplier_name": "OMEGA PRINTING CO",
+          "customer_name": "Hooli Systems",
+          "currency": "USD",
+          "subtotal": "25182.66",
+          "discount": null,
+          "tax": "2518.27",
+          "total": "27700.93",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9816908499051912
+    },
+    "029_image.png": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01593",
+          "invoice_date": "2024-06-11",
+          "supplier_name": "Evergreen Facilities Ltd",
+          "customer_name": "Wonka Confectionery",
+          "currency": "EUR",
+          "subtotal": "41703.14",
+          "discount": null,
+          "tax": "0.00",
+          "total": "41703.14",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": 0.9851824776170302
+    },
+    "030_photo.jpg": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A001624",
+          "invoice_date": "2024-09-06",
+          "supplier_name": "Meridlian Software Corp",
+          "customer_name": "Wonka Confectionery",
+          "currency": "EUR",
+          "subtotal": "18039.92",
+          "discount": null,
+          "tax": "902.00",
+          "total": "18941.92",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "LINE_ITEM_MISMATCH"
+      ],
+      "ocr_confidence": 0.9655354430555573
+    },
+    "031_photo.jpg": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "InvoiceA001659",
+          "invoice_date": null,
+          "supplier_name": "PIONEERNETWORKS GMBH",
+          "customer_name": "Tyrell Engineering",
+          "currency": "USD",
+          "subtotal": "48033.15",
+          "discount": "-4803.32",
+          "tax": "2401.66",
+          "total": "45631.49",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD",
+        "UNGROUNDED_VALUE"
+      ],
+      "ocr_confidence": 0.9743192744484807
+    },
+    "032_photo.jpg": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-1669",
+          "invoice_date": "2025-04-25",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Hool Systems",
+          "currency": "GBP",
+          "subtotal": "12857.71",
+          "discount": null,
+          "tax": "1928.66",
+          "total": "14786.37",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "LINE_ITEM_MISMATCH",
+        "SUBTOTAL_MISMATCH"
+      ],
+      "ocr_confidence": 0.9688832058045086
+    },
+    "033_photo.jpg": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "Invoices/1673",
+          "invoice_date": null,
+          "supplier_name": "LOTUS STATIONERYHOUSE",
+          "customer_name": "Vandelay Industries",
+          "currency": "EUR",
+          "subtotal": "22643.28",
+          "discount": "-2264.33",
+          "tax": "1132.16",
+          "total": "21511.11",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD",
+        "UNGROUNDED_VALUE"
+      ],
+      "ocr_confidence": 0.9678664778068645
+    },
+    "034_multipage.tiff": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/1702",
+          "invoice_date": null,
+          "supplier_name": "Evergreen Facilities Ltd",
+          "customer_name": "OscorpPharma",
+          "currency": "USD",
+          "subtotal": "22706.96",
+          "discount": "-1135.35",
+          "tax": "3406.04",
+          "total": "24977.65",
+          "item_count": 5,
+          "method": "llm"
+        },
+        {
+          "invoice_number": "Sl/1728",
+          "invoice_date": "2024-01-09",
+          "supplier_name": "Rlverbend Paper Mills",
+          "customer_name": "Tyrell Engineering",
+          "currency": "GBP",
+          "subtotal": "9250.48",
+          "discount": null,
+          "tax": "0.00",
+          "total": "9250.48",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD",
+        "UNGROUNDED_VALUE"
+      ],
+      "ocr_confidence": 0.9858842647072009
+    },
+    "035_register_xlsx.xlsx": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-01755",
+          "invoice_date": "2024-07-24",
+          "supplier_name": "Brightway Supplies",
+          "customer_name": "Pied Piper Media",
+          "currency": "EUR",
+          "subtotal": "8583.89",
+          "discount": null,
+          "tax": "858.39",
+          "total": "9442.28",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-1790",
+          "invoice_date": "2025-04-10",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Oscorp Pharma",
+          "currency": "USD",
+          "subtotal": "27127.36",
+          "discount": "-4069.10",
+          "tax": "2712.74",
+          "total": "25771.00",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-1805",
+          "invoice_date": "2025-10-12",
+          "supplier_name": "Meridian Software Corp",
+          "customer_name": "Massive Dynamic",
+          "currency": "BDT",
+          "subtotal": "5812.66",
+          "discount": null,
+          "tax": "581.27",
+          "total": "6393.93",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/1835",
+          "invoice_date": "2025-11-17",
+          "supplier_name": "Delta Wave Communications",
+          "customer_name": "Gringotts Finance",
+          "currency": "USD",
+          "subtotal": "2643.52",
+          "discount": "-132.18",
+          "tax": "396.53",
+          "total": "2907.87",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A001843",
+          "invoice_date": "2024-04-03",
+          "supplier_name": "Ironclad Industrial Supply",
+          "customer_name": "Stark Manufacturing",
+          "currency": "EUR",
+          "subtotal": "19127.45",
+          "discount": null,
+          "tax": "0.00",
+          "total": "19127.45",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-1853",
+          "invoice_date": "2024-10-10",
+          "supplier_name": "Brightway Supplies",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "USD",
+          "subtotal": "10948.62",
+          "discount": null,
+          "tax": "1094.86",
+          "total": "12043.48",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-1870",
+          "invoice_date": "2024-05-09",
+          "supplier_name": "Delta Wave Communications",
+          "customer_name": "Vandelay Industries",
+          "currency": "EUR",
+          "subtotal": "12800.64",
+          "discount": "-640.03",
+          "tax": "0.00",
+          "total": "12160.61",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A001901",
+          "invoice_date": "2025-03-12",
+          "supplier_name": "Ironclad Industrial Supply",
+          "customer_name": "Initech Solutions",
+          "currency": "USD",
+          "subtotal": "9065.89",
+          "discount": null,
+          "tax": "1359.88",
+          "total": "10425.77",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "036_register_xlsx.xlsx": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/1935",
+          "invoice_date": "2025-04-09",
+          "supplier_name": "Summit Tools Ltd",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "USD",
+          "subtotal": "34632.31",
+          "discount": "-5194.85",
+          "tax": "5194.85",
+          "total": "34632.31",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/1956",
+          "invoice_date": "2025-01-18",
+          "supplier_name": "Brightway Supplies",
+          "customer_name": "Oscorp Pharma",
+          "currency": "USD",
+          "subtotal": "10883.58",
+          "discount": null,
+          "tax": "1632.54",
+          "total": "12516.12",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/1992",
+          "invoice_date": "2025-11-17",
+          "supplier_name": "Nimbus Cloud Services",
+          "customer_name": "Vandelay Industries",
+          "currency": "GBP",
+          "subtotal": "9834.60",
+          "discount": "-1475.19",
+          "tax": "983.46",
+          "total": "9342.87",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2016",
+          "invoice_date": "2024-10-12",
+          "supplier_name": "Riverbend Paper Mills",
+          "customer_name": "Stark Manufacturing",
+          "currency": "USD",
+          "subtotal": "26933.17",
+          "discount": "-2693.32",
+          "tax": "4039.98",
+          "total": "28279.83",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2018",
+          "invoice_date": "2025-06-27",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Vandelay Industries",
+          "currency": "BDT",
+          "subtotal": "19881.07",
+          "discount": null,
+          "tax": "2982.16",
+          "total": "22863.23",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002047",
+          "invoice_date": "2024-10-06",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Pied Piper Media",
+          "currency": "USD",
+          "subtotal": "8180.25",
+          "discount": "-409.01",
+          "tax": "0.00",
+          "total": "7771.24",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002048",
+          "invoice_date": "2025-03-16",
+          "supplier_name": "Harbor Point Electronics",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "USD",
+          "subtotal": "26484.80",
+          "discount": "-2648.48",
+          "tax": "3972.72",
+          "total": "27809.04",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002056",
+          "invoice_date": "2024-01-22",
+          "supplier_name": "Pioneer Networks GmbH",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "EUR",
+          "subtotal": "18461.24",
+          "discount": null,
+          "tax": "2769.19",
+          "total": "21230.43",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "037_register_csv.csv": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/2246",
+          "invoice_date": "2024-03-26",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "EUR",
+          "subtotal": "28204.00",
+          "discount": "-2820.40",
+          "tax": "2820.40",
+          "total": "28204.00",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02268",
+          "invoice_date": "2024-05-20",
+          "supplier_name": "Zenith Logistics Inc",
+          "customer_name": "Wayne Holdings",
+          "currency": "USD",
+          "subtotal": "29838.95",
+          "discount": "-4475.84",
+          "tax": "4475.84",
+          "total": "29838.95",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2276",
+          "invoice_date": "2024-08-31",
+          "supplier_name": "Evergreen Facilities Ltd",
+          "customer_name": "Initech Solutions",
+          "currency": "EUR",
+          "subtotal": "4262.99",
+          "discount": "-213.15",
+          "tax": "0.00",
+          "total": "4049.84",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2300",
+          "invoice_date": "2025-06-22",
+          "supplier_name": "Keystone Security Systems",
+          "customer_name": "Wonka Confectionery",
+          "currency": "EUR",
+          "subtotal": "18441.67",
+          "discount": "-922.08",
+          "tax": "0.00",
+          "total": "17519.59",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002330",
+          "invoice_date": "2025-10-08",
+          "supplier_name": "Harbor Point Electronics",
+          "customer_name": "Pied Piper Media",
+          "currency": "USD",
+          "subtotal": "17213.38",
+          "discount": "-2582.01",
+          "tax": "860.67",
+          "total": "15492.04",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2334",
+          "invoice_date": "2024-10-06",
+          "supplier_name": "Nimbus Cloud Services",
+          "customer_name": "Pied Piper Media",
+          "currency": "GBP",
+          "subtotal": "16139.93",
+          "discount": "-807.00",
+          "tax": "1613.99",
+          "total": "16946.92",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2353",
+          "invoice_date": "2025-04-01",
+          "supplier_name": "Tandem Digital Agency",
+          "customer_name": "Gringotts Finance",
+          "currency": "GBP",
+          "subtotal": "11305.96",
+          "discount": "-1695.89",
+          "tax": "1695.89",
+          "total": "11305.96",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02358",
+          "invoice_date": "2025-10-22",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Hooli Systems",
+          "currency": "USD",
+          "subtotal": "13947.95",
+          "discount": "-1394.80",
+          "tax": "2092.19",
+          "total": "14645.34",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "038_register_csv_semicolon.csv": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2383",
+          "invoice_date": "2024-09-25",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Wayne Holdings",
+          "currency": "EUR",
+          "subtotal": "19698.89",
+          "discount": "-1969.89",
+          "tax": "2954.83",
+          "total": "20683.83",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02394",
+          "invoice_date": "2025-01-05",
+          "supplier_name": "Summit Tools Ltd",
+          "customer_name": "Stark Manufacturing",
+          "currency": "USD",
+          "subtotal": "34468.24",
+          "discount": null,
+          "tax": "0.00",
+          "total": "34468.24",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02399",
+          "invoice_date": "2024-11-20",
+          "supplier_name": "Coral Bay Trading",
+          "customer_name": "Initech Solutions",
+          "currency": "USD",
+          "subtotal": "32062.00",
+          "discount": "-4809.30",
+          "tax": "4809.30",
+          "total": "32062.00",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2410",
+          "invoice_date": "2024-08-18",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Wonka Confectionery",
+          "currency": "EUR",
+          "subtotal": "7612.09",
+          "discount": null,
+          "tax": "761.21",
+          "total": "8373.30",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2432",
+          "invoice_date": "2024-01-30",
+          "supplier_name": "Omega Printing Co",
+          "customer_name": "Globex Corporation",
+          "currency": "USD",
+          "subtotal": "20288.82",
+          "discount": "-2028.88",
+          "tax": "2028.88",
+          "total": "20288.82",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2458",
+          "invoice_date": "2025-04-09",
+          "supplier_name": "Omega Printing Co",
+          "customer_name": "Gringotts Finance",
+          "currency": "USD",
+          "subtotal": "9129.08",
+          "discount": "-456.45",
+          "tax": "0.00",
+          "total": "8672.63",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2466",
+          "invoice_date": "2025-04-05",
+          "supplier_name": "Silverline Consulting",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "USD",
+          "subtotal": "32313.25",
+          "discount": null,
+          "tax": "0.00",
+          "total": "32313.25",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02482",
+          "invoice_date": "2025-08-20",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Globex Corporation",
+          "currency": "BDT",
+          "subtotal": "23989.48",
+          "discount": "-1199.47",
+          "tax": "0.00",
+          "total": "22790.01",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "039_wrong_total.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A002507",
+          "invoice_date": "2025-07-17",
+          "supplier_name": "NORTHWIND HARDWARE",
+          "customer_name": "Tyrell Engineering",
+          "currency": "GBP",
+          "subtotal": "16120.70",
+          "discount": null,
+          "tax": "0.00",
+          "total": "16153.69",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "040_wrong_total.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/2528",
+          "invoice_date": "2024-06-15",
+          "supplier_name": "REDWOOD FURNITURE CO",
+          "customer_name": "Cyberdyne Labs",
+          "currency": "EUR",
+          "subtotal": "20971.12",
+          "discount": "-2097.11",
+          "tax": "2097.11",
+          "total": "21029.28",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "041_wrong_total.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A002530",
+          "invoice_date": "2024-09-28",
+          "supplier_name": "Coral Bay Trading",
+          "customer_name": "Pied Piper Media",
+          "currency": "EUR",
+          "subtotal": "8855.07",
+          "discount": "-885.51",
+          "tax": "442.75",
+          "total": "8430.10",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "042_missing_date.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-02534",
+          "invoice_date": null,
+          "supplier_name": "SUMMIT TOOLS LTD",
+          "customer_name": "Stark Manufacturing",
+          "currency": "GBP",
+          "subtotal": "35988.78",
+          "discount": "-3598.88",
+          "tax": "3598.88",
+          "total": "35988.78",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD"
+      ],
+      "ocr_confidence": null
+    },
+    "043_missing_date.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/2552",
+          "invoice_date": null,
+          "supplier_name": "Silverline Consulting",
+          "customer_name": "Wayne Holdings",
+          "currency": "USD",
+          "subtotal": "16789.54",
+          "discount": "-2518.43",
+          "tax": "1678.95",
+          "total": "15950.06",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "MISSING_FIELD"
+      ],
+      "ocr_confidence": null
+    },
+    "044_dup_original.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "SI/2581",
+          "invoice_date": "2025-05-05",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Stark Manufacturing",
+          "currency": "EUR",
+          "subtotal": "41600.00",
+          "discount": null,
+          "tax": "4160.00",
+          "total": "45760.00",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "045_dup_copy.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/2581",
+          "invoice_date": "2025-05-05",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Stark Manufacturing",
+          "currency": "EUR",
+          "subtotal": "41600.00",
+          "discount": null,
+          "tax": "4160.00",
+          "total": "45760.00",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "DUPLICATE_FILE",
+        "DUPLICATE_INVOICE"
+      ],
+      "ocr_confidence": null
+    },
+    "046_dup_original.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2590",
+          "invoice_date": "2025-07-17",
+          "supplier_name": "Harbor Point Electronics",
+          "customer_name": "Vandelay Industries",
+          "currency": "EUR",
+          "subtotal": "11914.48",
+          "discount": "-1787.17",
+          "tax": "1787.17",
+          "total": "11914.48",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "047_dup_copy.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2590",
+          "invoice_date": "2025-07-17",
+          "supplier_name": "Harbor Point Electronics",
+          "customer_name": "Vandelay Industries",
+          "currency": "EUR",
+          "subtotal": "11914.48",
+          "discount": "-1787.17",
+          "tax": "1787.17",
+          "total": "11914.48",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "DUPLICATE_FILE",
+        "DUPLICATE_INVOICE"
+      ],
+      "ocr_confidence": null
+    },
+    "048_pair_a.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002616",
+          "invoice_date": "2024-07-09",
+          "supplier_name": "Delta Wave Communications",
+          "customer_name": "Tyrell Engineering",
+          "currency": "GBP",
+          "subtotal": "13007.86",
+          "discount": null,
+          "tax": "1300.79",
+          "total": "14308.65",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "049_pair_b.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A002616",
+          "invoice_date": "2024-07-09",
+          "supplier_name": "DELTA WAVE COMMUNICATIONS",
+          "customer_name": "Tyrell Engineering",
+          "currency": "GBP",
+          "subtotal": "13007.86",
+          "discount": null,
+          "tax": "1300.79",
+          "total": "14308.65",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "DUPLICATE_INVOICE"
+      ],
+      "ocr_confidence": null
+    },
+    "050_pair_a.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002625",
+          "invoice_date": "2024-10-06",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Pied Piper Media",
+          "currency": "USD",
+          "subtotal": "21890.46",
+          "discount": null,
+          "tax": "0.00",
+          "total": "21890.46",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "051_pair_b.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "A002625",
+          "invoice_date": "2024-10-06",
+          "supplier_name": "CRESCENT OFFICE SOLUTIONS",
+          "customer_name": "Pied Piper Media",
+          "currency": "USD",
+          "subtotal": "21890.46",
+          "discount": null,
+          "tax": "0.00",
+          "total": "21890.46",
+          "item_count": 2,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "DUPLICATE_INVOICE"
+      ],
+      "ocr_confidence": null
+    },
+    "052_pair_a.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-02632",
+          "invoice_date": "2024-05-23",
+          "supplier_name": "Blue Orchid Catering",
+          "customer_name": "Hooli Systems",
+          "currency": "GBP",
+          "subtotal": "21027.50",
+          "discount": null,
+          "tax": "1051.38",
+          "total": "22078.88",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "053_scanned.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2025-02632",
+          "invoice_date": "2024-05-23",
+          "supplier_name": "BLUE ORCHID CATERING",
+          "customer_name": "Hooli Systems",
+          "currency": null,
+          "subtotal": "21027.50",
+          "discount": null,
+          "tax": "1051.38",
+          "total": "22078.88",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "DUPLICATE_INVOICE",
+        "MISSING_FIELD",
+        "UNGROUNDED_VALUE"
+      ],
+      "ocr_confidence": 0.9831701031749608
+    },
+    "054_pair_a.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2652",
+          "invoice_date": "2025-10-16",
+          "supplier_name": "Evergreen Facilities Ltd",
+          "customer_name": "Hooli Systems",
+          "currency": "BDT",
+          "subtotal": "20947.07",
+          "discount": null,
+          "tax": "1047.35",
+          "total": "21994.42",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "055_pair_b.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2652",
+          "invoice_date": "2025-10-16",
+          "supplier_name": "EVERGREEN FACILITIES LTD",
+          "customer_name": "Hooli Systems",
+          "currency": "BDT",
+          "subtotal": "20947.07",
+          "discount": null,
+          "tax": "1047.35",
+          "total": "22025.72",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH",
+        "DUPLICATE_INVOICE",
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "056_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2689",
+          "invoice_date": "2024-03-04",
+          "supplier_name": "Keystone Security Systems",
+          "customer_name": "Massive Dynamic",
+          "currency": "EUR",
+          "subtotal": "32756.00",
+          "discount": null,
+          "tax": "1637.80",
+          "total": "34393.80",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "057_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2709",
+          "invoice_date": "2025-02-09",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Tyrell Engineering",
+          "currency": "USD",
+          "subtotal": "24273.99",
+          "discount": "-2427.40",
+          "tax": "0.00",
+          "total": "21846.59",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "058_register_xlsx.xlsx": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "INV-2689",
+          "invoice_date": "2024-03-04",
+          "supplier_name": "Keystone Security Systems",
+          "customer_name": "Massive Dynamic",
+          "currency": "EUR",
+          "subtotal": "32756.00",
+          "discount": null,
+          "tax": "1637.80",
+          "total": "34393.80",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2709",
+          "invoice_date": "2025-02-09",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Tyrell Engineering",
+          "currency": "USD",
+          "subtotal": "24273.99",
+          "discount": "-2427.40",
+          "tax": "0.00",
+          "total": "21846.59",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02736",
+          "invoice_date": "2024-05-18",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Oscorp Pharma",
+          "currency": "USD",
+          "subtotal": "3197.17",
+          "discount": "-159.86",
+          "tax": "479.58",
+          "total": "3516.89",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002766",
+          "invoice_date": "2025-06-28",
+          "supplier_name": "Redwood Furniture Co",
+          "customer_name": "Tyrell Engineering",
+          "currency": "USD",
+          "subtotal": "17261.40",
+          "discount": "-863.07",
+          "tax": "863.07",
+          "total": "17261.40",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02770",
+          "invoice_date": "2024-02-15",
+          "supplier_name": "Redwood Furniture Co",
+          "customer_name": "Soylent Foods Ltd",
+          "currency": "USD",
+          "subtotal": "15127.82",
+          "discount": null,
+          "tax": "756.39",
+          "total": "15884.21",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "059_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002782",
+          "invoice_date": "2025-07-23",
+          "supplier_name": "BLUE ORCHID CATERING",
+          "customer_name": "Globex Corporation",
+          "currency": "EUR",
+          "subtotal": "12597.35",
+          "discount": "-1259.74",
+          "tax": "1259.74",
+          "total": "12597.35",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "060_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002791",
+          "invoice_date": "2024-09-05",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Stark Manufacturing",
+          "currency": "USD",
+          "subtotal": "21611.99",
+          "discount": "-1080.60",
+          "tax": "2161.20",
+          "total": "22692.59",
+          "item_count": 5,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "061_register_csv.csv": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002782",
+          "invoice_date": "2025-07-23",
+          "supplier_name": "Blue Orchid Catering",
+          "customer_name": "Globex Corporation",
+          "currency": "EUR",
+          "subtotal": "12597.35",
+          "discount": "-1259.74",
+          "tax": "1259.74",
+          "total": "12597.35",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002791",
+          "invoice_date": "2024-09-05",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Stark Manufacturing",
+          "currency": "USD",
+          "subtotal": "21611.99",
+          "discount": "-1080.60",
+          "tax": "2161.20",
+          "total": "22692.59",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2813",
+          "invoice_date": "2024-01-16",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Massive Dynamic",
+          "currency": "EUR",
+          "subtotal": "23824.38",
+          "discount": "-3573.66",
+          "tax": "1191.22",
+          "total": "21441.94",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2843",
+          "invoice_date": "2025-04-25",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Tyrell Engineering",
+          "currency": "BDT",
+          "subtotal": "35177.22",
+          "discount": null,
+          "tax": "3517.72",
+          "total": "38694.94",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "SI/2870",
+          "invoice_date": "2024-06-05",
+          "supplier_name": "Crescent Office Solutions",
+          "customer_name": "Hooli Systems",
+          "currency": "USD",
+          "subtotal": "15246.58",
+          "discount": "-1524.66",
+          "tax": "762.33",
+          "total": "14484.25",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "062_xpair_pdf.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2875",
+          "invoice_date": "2024-01-07",
+          "supplier_name": "Atlas Freight Partners",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "EUR",
+          "subtotal": "29843.70",
+          "discount": "-4476.56",
+          "tax": "1492.19",
+          "total": "26859.33",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "063_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A002910",
+          "invoice_date": "2024-01-13",
+          "supplier_name": "Acme Trading Ltd",
+          "customer_name": "Wonka Confectionery",
+          "currency": "USD",
+          "subtotal": "17859.40",
+          "discount": null,
+          "tax": "1785.94",
+          "total": "19645.34",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "064_register_xlsx.xlsx": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "INV-2875",
+          "invoice_date": "2024-01-07",
+          "supplier_name": "Atlas Freight Partners",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "EUR",
+          "subtotal": "29843.70",
+          "discount": "-4476.56",
+          "tax": "1492.19",
+          "total": "26901.40",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002910",
+          "invoice_date": "2024-01-13",
+          "supplier_name": "Acme Trading Ltd",
+          "customer_name": "Wonka Confectionery",
+          "currency": "USD",
+          "subtotal": "17859.40",
+          "discount": null,
+          "tax": "1785.94",
+          "total": "19645.34",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A002934",
+          "invoice_date": "2025-04-15",
+          "supplier_name": "Riverbend Paper Mills",
+          "customer_name": "Stark Manufacturing",
+          "currency": "GBP",
+          "subtotal": "13558.07",
+          "discount": "-2033.71",
+          "tax": "677.90",
+          "total": "12202.26",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-02935",
+          "invoice_date": "2024-03-25",
+          "supplier_name": "Blue Orchid Catering",
+          "customer_name": "Tyrell Engineering",
+          "currency": "GBP",
+          "subtotal": "4630.77",
+          "discount": "-463.08",
+          "tax": "694.62",
+          "total": "4862.31",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2938",
+          "invoice_date": "2025-12-01",
+          "supplier_name": "Northwind Hardware",
+          "customer_name": "Massive Dynamic",
+          "currency": "BDT",
+          "subtotal": "9734.59",
+          "discount": null,
+          "tax": "0.00",
+          "total": "9734.59",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH",
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "065_xpair_pdf.pdf": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/2973",
+          "invoice_date": "2025-01-28",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Gringotts Finance",
+          "currency": "BDT",
+          "subtotal": "13543.77",
+          "discount": "-1354.38",
+          "tax": "677.19",
+          "total": "12866.58",
+          "item_count": 3,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH"
+      ],
+      "ocr_confidence": null
+    },
+    "066_xpair_pdf.pdf": {
+      "status": "completed",
+      "invoices": [
+        {
+          "invoice_number": "A003002",
+          "invoice_date": "2024-08-21",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Wonka Confectionery",
+          "currency": "GBP",
+          "subtotal": "29806.44",
+          "discount": null,
+          "tax": "4470.97",
+          "total": "34277.41",
+          "item_count": 4,
+          "method": "llm"
+        }
+      ],
+      "issue_codes": [],
+      "ocr_confidence": null
+    },
+    "067_register_csv.csv": {
+      "status": "needs_review",
+      "invoices": [
+        {
+          "invoice_number": "SI/2973",
+          "invoice_date": "2025-01-28",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Gringotts Finance",
+          "currency": "BDT",
+          "subtotal": "13543.77",
+          "discount": "-1354.38",
+          "tax": "677.19",
+          "total": "12907.92",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A003002",
+          "invoice_date": "2024-08-21",
+          "supplier_name": "Lotus Stationery House",
+          "customer_name": "Wonka Confectionery",
+          "currency": "GBP",
+          "subtotal": "29806.44",
+          "discount": null,
+          "tax": "4470.97",
+          "total": "34277.41",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "A003022",
+          "invoice_date": "2025-01-03",
+          "supplier_name": "Sunrise Cleaning Services",
+          "customer_name": "Wayne Holdings",
+          "currency": "USD",
+          "subtotal": "8695.53",
+          "discount": null,
+          "tax": "0.00",
+          "total": "8695.53",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-03028",
+          "invoice_date": "2025-08-08",
+          "supplier_name": "Summit Tools Ltd",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "USD",
+          "subtotal": "20953.47",
+          "discount": null,
+          "tax": "3143.02",
+          "total": "24096.49",
+          "item_count": 0,
+          "method": "rules"
+        },
+        {
+          "invoice_number": "INV-2025-03060",
+          "invoice_date": "2025-04-13",
+          "supplier_name": "Nimbus Cloud Services",
+          "customer_name": "Umbrella Retail Group",
+          "currency": "USD",
+          "subtotal": "14098.07",
+          "discount": "-704.90",
+          "tax": "1409.81",
+          "total": "14802.98",
+          "item_count": 0,
+          "method": "rules"
+        }
+      ],
+      "issue_codes": [
+        "CROSS_CHECK_MISMATCH",
+        "TOTAL_MISMATCH"
+      ],
+      "ocr_confidence": null
+    }
+  },
+  "ocr_confidence": {
+    "files": 16,
+    "mean": 0.979989406017803,
+    "min": 0.9655354430555573
+  }
+}

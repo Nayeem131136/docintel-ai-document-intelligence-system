@@ -29,3 +29,8 @@ Thumbs.db
 .vscode/
 *.log
 .cache/
+
+# generated evaluation data and coverage
+eval_data/
+.coverage
+htmlcov/

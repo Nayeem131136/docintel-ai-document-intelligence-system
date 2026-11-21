@@ -1,4 +1,4 @@
-"""Tests for Phase 3: parsing, anti-hallucination grounding, the Groq client,
+"""Tests for extraction: parsing, anti-hallucination grounding, the Groq client,
 extraction, validation, duplicate detection and cross-verification.
 
 The LLM is replaced by a fake (no network, no API key). The Groq HTTP client is
@@ -808,3 +808,32 @@ class EndToEndTests(MediaTestCase):
         with override_settings(EXTRACTION_MAX_CHARS=60):
             document = self.process(path, FakeLLM(GOOD_JSON))
         self.assertIn("TEXT_TRUNCATED", self.issue_codes(document))
+
+
+# =========================================================================== regressions found by the evaluation dataset
+class EvaluationRegressionTests(SimpleTestCase):
+    def test_labels_with_hash_dot_and_title_lines(self):
+        text = "NIMBUS CLOUD SERVICES\nINVOICE\nInvoice # A001031\nDate: 2025-07-03\nBilled to:\nMassive Dynamic\nItem Quantity\n"
+        draft = extract_with_rules(text)
+        self.assertEqual((draft.invoice_number, str(draft.invoice_date), draft.customer_name),
+                         ("A001031", "2025-07-03", "Massive Dynamic"))
+        self.assertIsNone(draft.supplier_name)                      # a letterhead is still never guessed
+
+    def test_tax_invoice_style_labels(self):
+        text = "TAX INVOICE\nInv. No.: SI/1055\nIssued: 2 August 2024\nFrom: Ironclad Industrial Supply\nTo: Wayne Holdings\n"
+        draft = extract_with_rules(text)
+        self.assertEqual((draft.invoice_number, str(draft.invoice_date), draft.supplier_name, draft.customer_name),
+                         ("SI/1055", "2024-08-02", "Ironclad Industrial Supply", "Wayne Holdings"))
+
+    def test_billed_to_label_does_not_take_a_number_line(self):
+        draft = extract_with_rules("Invoice No: INV-9\nBilled to:\n12345 67\n")
+        self.assertIsNone(draft.customer_name)
+
+    def test_register_with_short_headers(self):
+        rows = [["Inv #", "Date", "Supplier Name", "Customer Name", "Sub Total", "Tax Amount", "Amount", "Curr"],
+                ["INV-1", "2025-04-07", "Summit Tools Ltd", "Stark", 100.0, 10.0, 110.0, "EUR"]]
+        drafts = drafts_from_register(rows, 1)
+        self.assertEqual(len(drafts), 1)
+        self.assertEqual((drafts[0].invoice_number, drafts[0].total, drafts[0].currency), ("INV-1", Decimal("110.0"), "EUR"))
+        gross = [["Invoice Number", "Vendor", "Gross Total"], ["X-1", "Acme", 5]]
+        self.assertEqual(len(drafts_from_register(gross, 1)), 1)

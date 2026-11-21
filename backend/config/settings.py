@@ -119,7 +119,7 @@ STORAGES = {
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# --- Uploads (security: size limit; type validation arrives in Phase 4) ---
+# --- Uploads (security: size limit) ---
 MAX_UPLOAD_SIZE_MB = int(os.environ.get("MAX_UPLOAD_SIZE_MB", "50"))
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
@@ -129,7 +129,7 @@ OCR_DPI = int(os.environ.get("OCR_DPI", "200"))
 MAX_SPREADSHEET_ROWS = int(os.environ.get("MAX_SPREADSHEET_ROWS", "100000"))
 ALLOWED_UPLOAD_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".tif", ".tiff", ".xlsx", ".xls", ".csv"}
 
-# --- LLM extraction (Phase 3) ---------------------------------------------
+# --- LLM extraction ---------------------------------------------
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "")
 GROQ_BASE_URL = os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
@@ -189,7 +189,7 @@ if not DEBUG and env_bool("DJANGO_SECURE_SSL", False):
     CSRF_COOKIE_SECURE = True
     SECURE_HSTS_SECONDS = 31536000
 
-# --- Search (Phase 5) -----------------------------------------------------
+# --- Search -----------------------------------------------------
 EMBEDDING_BACKEND = os.environ.get("EMBEDDING_BACKEND", "auto")          # auto | fastembed | hashing
 if "test" in sys.argv[1:2]:
     EMBEDDING_BACKEND = "hashing"      # tests must be offline and fast

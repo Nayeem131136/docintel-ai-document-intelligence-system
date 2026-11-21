@@ -64,12 +64,12 @@ describe("buildPayload", () => {
 
     expect(
       buildPayload(
-        { ...initial, total: "182.50", note: "typo" },
+        { ...initial, total: "190.00", note: "typo" },
         initial,
         false,
       ),
     ).toEqual({
-      total: "182.50",
+      total: "190.00",
       note: "typo",
     });
   });
@@ -222,7 +222,7 @@ describe("<InvoiceEditor>", () => {
       new Response(
         JSON.stringify({
           ...invoice,
-          total: "182.50",
+          total: "190.00",
           updated_at: "t2",
         }),
         { status: 200 },
@@ -242,7 +242,7 @@ describe("<InvoiceEditor>", () => {
     const total = screen.getByLabelText("Total");
 
     await userEvent.clear(total);
-    await userEvent.type(total, "182.50");
+    await userEvent.type(total, "190.00");
 
     expect(save).toBeEnabled();
 
@@ -255,7 +255,7 @@ describe("<InvoiceEditor>", () => {
     expect(url).toBe("/api/results/7/");
     expect(init.method).toBe("PATCH");
     expect(JSON.parse(init.body)).toEqual({
-      total: "182.50",
+      total: "190.00",
     });
   });
 

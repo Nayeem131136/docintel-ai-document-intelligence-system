@@ -26,15 +26,17 @@ _SYMBOL_TO_CODE = {
     "৳": "BDT",
 }
 
+# Matched line by line ([ \t] never crosses a newline), so a title such as "INVOICE"
+# cannot swallow the next label.
 INVOICE_NUMBER = re.compile(
-    r"\b(?:tax\s+)?(?:invoice|inv|receipt|bill)\s*"
-    r"(?:no\.?|number|num\.?|#|id)?\s*[:#\-]?\s*"
-    r"([A-Z0-9][A-Z0-9\-/_\.]{1,40})",
+    r"\b(?:tax[ \t]+)?(?:invoice|inv|receipt|bill)\.?[ \t]*"
+    r"(?:no\.?|number|num\.?|#|id)?[ \t]*[:#\-]?[ \t]*"
+    r"([A-Z0-9][A-Z0-9\-/_.]{1,40})",
     re.I,
 )
 
 DATE_LABEL = re.compile(
-    r"(?:invoice\s*date|date\s*of\s*issue|issue\s*date|bill\s*date|date)"
+    r"(?:invoice\s*date|date\s*of\s*issue|issue\s*date|bill\s*date|issued(?:\s*on)?(?!\s*by)|date)"
     r"\s*[:\-]?\s*(.{6,30})",
     re.I,
 )
@@ -46,8 +48,8 @@ SUPPLIER_LABEL = re.compile(
 )
 
 CUSTOMER_LABEL = re.compile(
-    r"^\s*(?:bill(?:ed)?\s*to|customer|client|sold\s*to|buyer|ship\s*to)"
-    r"(?:\s*name)?\s*[:\-]?\s*(.+)$",
+    r"^\s*(?:(?:bill(?:ed)?\s*to|customer|client|sold\s*to|buyer|ship\s*to)"
+    r"(?:\s*name)?\s*[:\-]?|to\s*:)\s*(.*)$",
     re.I,
 )
 
@@ -73,7 +75,7 @@ TOTAL_LABEL = re.compile(
 )
 
 _PERCENT = re.compile(r"\d+(?:[.,]\d+)?\s*%")
-_NUMBER = re.compile(r"-?\(?\d[\d,]*(?:\.\d+)?\)?")
+_NUMBER = re.compile(r"-?\(?\d[\d.,]*\)?")   # also matches 1.234,50 (European)
 _ROW_SPLIT = re.compile(r"\s{2,}|\s*\|\s*|\t")
 
 _SKIP_ITEM_WORDS = re.compile(
@@ -85,6 +87,7 @@ _SKIP_ITEM_WORDS = re.compile(
 
 def _last_amount(line: str) -> Decimal | None:
     line = re.sub(r"(?<=\d),\s+(?=\d)", "", line)
+    line = _PERCENT.sub(" ", line)
 
     for token in reversed(_NUMBER.findall(line)):
         amount = parse_amount(token.rstrip(".,"))
@@ -95,10 +98,11 @@ def _last_amount(line: str) -> Decimal | None:
 
 
 def _find_invoice_number(text: str) -> str | None:
-    for match in INVOICE_NUMBER.finditer(text):
-        value = match.group(1).rstrip("./-_")
-        if re.search(r"\d", value):
-            return value
+    for line in text.splitlines():
+        for match in INVOICE_NUMBER.finditer(line):
+            value = match.group(1).rstrip("./-_")
+            if re.search(r"\d", value):
+                return value
 
     return None
 
@@ -179,7 +183,8 @@ def extract_with_rules(text: str) -> Draft:
     draft.invoice_date = _find_date(text, draft)
     draft.currency = _find_currency(text)
 
-    for line in text.splitlines():
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
         stripped = line.strip()
 
         if not stripped:
@@ -191,9 +196,13 @@ def extract_with_rules(text: str) -> Draft:
             )
 
         elif draft.customer_name is None and (m := CUSTOMER_LABEL.match(stripped)):
-            draft.customer_name = clean_name(
-                re.split(r"\s{2,}|\s*\|\s*", m.group(1))[0]
-            )
+            value = m.group(1).strip()
+            if not value:        # "Billed to:" on its own line: the name is on the next line
+                value = next((l.strip() for l in lines[index + 1:index + 3] if l.strip()), "")
+                if re.search(r"\d{3,}|:\s*$", value) or len(value) < 2:
+                    value = ""
+            if value:
+                draft.customer_name = clean_name(re.split(r"\s{2,}|\s*\|\s*", value)[0])
 
         item = parse_line_item(stripped)
 

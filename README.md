@@ -7,7 +7,7 @@ using OCR and an LLM, extracts structured invoice data, validates totals and dup
 cross-verifies documents, and makes everything searchable through an API and web interface.
 
 > **Status: in development, built phase by phase.**
-> Phases 1-6 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search, React web app) are complete. See the roadmap below.
+> Phases 1-7 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search, React web app, tests and evaluation) are complete. See the roadmap below.
 
 ## Roadmap
 
@@ -19,7 +19,7 @@ cross-verifies documents, and makes everything searchable through an API and web
 | 4 | REST API and background jobs | Done |
 | 5 | Keyword and semantic search | Done |
 | 6 | React frontend | Done |
-| 7 | Tests and evaluation | Planned |
+| 7 | Tests and evaluation | Done |
 | 8 | Documentation and final delivery | Planned |
 
 ## Tech stack
@@ -129,6 +129,18 @@ python manage.py reindex_search        # rebuild the index (e.g. after changing 
 The first semantic search/indexing downloads a small embedding model (~130 MB). Without internet access the app
 falls back to a built-in embedder automatically. See [docs/SEARCH.md](docs/SEARCH.md).
 
+## Evaluation
+
+Generate a labelled synthetic dataset and measure the real pipeline (accuracy, validation, cross-checks, search, speed):
+
+```bash
+cd backend
+python manage.py generate_eval_dataset --out eval_data --seed 42
+python manage.py run_evaluation --data eval_data --stress-pages 1000 --report ../docs/EVALUATION_REPORT.md
+```
+
+Details and the measured results: [docs/TESTING.md](docs/TESTING.md), [docs/EVALUATION_REPORT.md](docs/EVALUATION_REPORT.md).
+
 ## Try the pipeline from the command line
 
 Run any PDF, image, Excel or CSV file through the full pipeline (OCR, AI extraction, validation,
@@ -153,6 +165,7 @@ Process an invoice PDF and an Excel register containing the same invoice to see 
 ## Documentation
 
 - [Web app](docs/FRONTEND.md)
+- [Testing and evaluation](docs/TESTING.md) and the [evaluation report](docs/EVALUATION_REPORT.md)
 - [REST API](docs/API.md)
 - [Search](docs/SEARCH.md)
 - [Database schema](docs/DATABASE_SCHEMA.md)

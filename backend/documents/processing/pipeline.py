@@ -1,6 +1,6 @@
 """Text-extraction pipeline: validates a file, extracts every page, and records the history.
 
-``extract_document_text`` is the Phase 2 entry point. Later phases call it as the
+``extract_document_text`` is the entry point; the orchestrator and CLI call it as the
 first stage of the full pipeline (text -> AI extraction -> validation -> indexing).
 """
 import hashlib
@@ -44,7 +44,7 @@ def create_document_from_path(path: str | Path, original_filename: str | None = 
     """Validate a local file and store it as a QUEUED Document.
 
     Raises ProcessingError subclasses for unsupported / empty / oversized files,
-    so callers (the API in Phase 4, the CLI here) can reject them up front.
+    so callers (the API, the CLI) can reject them up front.
     """
     path = Path(path)
     name = original_filename or path.name
