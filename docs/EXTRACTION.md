@@ -1,4 +1,4 @@
-# AI extraction, validation and cross-verification (Phase 3)
+# AI extraction, validation and cross-verification
 
 Entry point: `documents/orchestrator.py` (`process_document`). It runs, in order:
 
@@ -56,7 +56,7 @@ Missing values are stored as NULL, never `0` or an empty guess.
 | Code | Severity | Meaning |
 |---|---|---|
 | `MISSING_FIELD` | error: invoice number, date, supplier, total. warning: currency, customer. info: subtotal, tax | a field was not found |
-| `TOTAL_MISMATCH` | error (or warning when no tax was found) | subtotal + tax does not equal total (tolerance 0.02) |
+| `TOTAL_MISMATCH` | error | subtotal + discount + tax does not equal total (tolerance 0.02). The discount is stored as a negative number and is only used when it is printed on the document |
 | `SUBTOTAL_MISMATCH` | error | line items do not add up to the subtotal |
 | `LINE_ITEM_MISMATCH` | error | quantity x unit price does not equal the line amount |
 | `DUPLICATE_INVOICE` | error / warning | same supplier + invoice number already processed (PDF + Excel pairs are not duplicates) |
@@ -91,6 +91,6 @@ Spreadsheet-vs-spreadsheet is not compared.
 - One invoice per page is assumed when splitting; two different invoices on one page are not separated.
 - Rule-based extraction is a fallback, not a replacement for the LLM.
 - Live Groq calls depend on your key, model and rate limits; they are covered by mocked tests, and real
-  accuracy is measured in the Phase 7 evaluation.
-- Reprocessing a document replaces its results (manual corrections on them are lost; the API in Phase 4
-  will warn before doing that).
+  accuracy is measured in the evaluation report.
+- Reprocessing a document replaces its results (manual corrections on them are lost; the REST API
+  requires `force` for finished documents).

@@ -1,0 +1,21 @@
+flowchart TD
+    A["Upload (one or many files)"] --> B{"Validate<br/>extension, real file type,<br/>size, zip and image bombs"}
+    B -- "rejected" --> R["Clear error, other files continue"]
+    B -- "ok" --> C["Save file + SHA-256<br/>status = queued"]
+    C --> D["Celery task<br/>(claimed once, time-limited)"]
+    D --> E{"File type"}
+    E -- "PDF" --> F["Page by page:<br/>text layer, or OCR for scanned pages"]
+    E -- "PNG / JPG / TIFF" --> G["OCR with retry:<br/>enhanced image, rotations"]
+    E -- "XLSX / XLS / CSV" --> H["Parse sheets;<br/>invoice registers map row to invoice"]
+    F --> I["Split into invoices<br/>(invoice number changes)"]
+    G --> I
+    H --> I
+    I --> J["Extract fields<br/>LLM JSON, rule-based fallback"]
+    J --> K["Grounding check:<br/>every value must appear in the text,<br/>otherwise it is set to empty"]
+    K --> L["Validate: missing fields, totals,<br/>line items, dates, duplicates"]
+    L --> M["Cross-verify PDF vs PDF,<br/>PDF vs Excel"]
+    M --> N["Index for search<br/>(text + embeddings)"]
+    N --> O{"Result"}
+    O -- "no problems" --> P["completed"]
+    O -- "flags raised" --> Q["needs_review<br/>(human corrects or approves)"]
+    D -- "unreadable / error" --> S["failed<br/>(can be reprocessed)"]

@@ -1,4 +1,4 @@
-# Document processing (Phase 2)
+# Document processing
 
 Entry points: `documents/processing/pipeline.py`
 (`create_document_from_path`, `extract_document_text`) and the CLI
@@ -59,10 +59,10 @@ Full details of each failure go to the server log; users only see a short messag
 - Pages are **streamed** and written to the database in batches of 20, so memory stays flat
   for ~1000-page files and `progress` / `pages_processed` update while the job runs.
 - Digital PDFs and spreadsheets are CPU-light. **Scanned pages are the slow path**
-  (roughly 1-3 seconds per page on CPU), so in Phase 4 each document runs as a background
+  (roughly 1-3 seconds per page on CPU), so each document runs as a background
   Celery job and workers can be scaled out with `docker compose up --scale worker=N`.
 - The OCR model is loaded once per process and reused.
-- Measured throughput is reported in the Phase 7 evaluation report (not estimated here).
+- Measured throughput is reported in the evaluation report (not estimated here).
 
 ## Known limitations
 

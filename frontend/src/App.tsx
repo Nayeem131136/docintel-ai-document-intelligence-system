@@ -8,6 +8,7 @@ import Documents from "./pages/Documents";
 import Invoices from "./pages/Invoices";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import SearchPage from "./pages/Search";
 
 function Protected({ children }: { children: JSX.Element }) {
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="documents/:id" element={<DocumentDetail />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="search" element={<SearchPage />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

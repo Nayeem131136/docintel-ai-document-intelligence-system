@@ -2,25 +2,82 @@
 
 > From raw invoices to verified, searchable data.
 
-AI-powered document intelligence system that processes PDF, image, Excel and CSV files
-using OCR and an LLM, extracts structured invoice data, validates totals and duplicates,
-cross-verifies documents, and makes everything searchable through an API and web interface.
+An AI-powered document intelligence system. It reads PDF, JPG/PNG/TIFF, XLSX/XLS and CSV files (including
+scanned documents and PDFs of about 1000 pages) with OCR, extracts invoice fields with an LLM **without inventing
+values**, validates the numbers, cross-verifies PDF-vs-PDF and PDF-vs-Excel, and makes everything searchable
+(keyword, semantic and hybrid) through a REST API and a web app.
 
-> **Status: in development, built phase by phase.**
-> Phases 1-7 (foundation, document processing, AI extraction and validation, REST API with background jobs, keyword and semantic search, React web app, tests and evaluation) are complete. See the roadmap below.
+![Dashboard](docs/images/dashboard.png)
 
-## Roadmap
-
-| Phase | Scope | Status |
+| Review an invoice | Search | Profile and API token |
 |---|---|---|
-| 1 | Foundation: Docker Compose, Django, Celery, database schema, health endpoint | Done |
-| 2 | Document processing: PDF, OCR, Excel, CSV pipelines | Done |
-| 3 | AI extraction, validation, cross-verification | Done |
-| 4 | REST API and background jobs | Done |
-| 5 | Keyword and semantic search | Done |
-| 6 | React frontend | Done |
-| 7 | Tests and evaluation | Done |
-| 8 | Documentation and final delivery | Planned |
+| ![Review](docs/images/review.png) | ![Search](docs/images/search.png) | ![Profile](docs/images/profile.png) |
+
+<img src="docs/images/mobile.png" width="200" alt="Mobile view">
+
+**Walkthrough video:** _add link here_
+
+## How it works
+
+![Pipeline](docs/images/pipeline.png)
+
+Upload -> background job (Celery) -> read the file (PDF text, OCR only where needed, spreadsheet rows) ->
+split into invoices -> LLM extraction (rule-based fallback) -> grounding check (values must appear in the
+document) -> validation -> cross-verification -> search index. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Assignment requirements and where they are
+
+| Requirement | Where |
+|---|---|
+| PDF, JPG, PNG, TIFF, XLSX, XLS, CSV input | [docs/PROCESSING.md](docs/PROCESSING.md) |
+| OCR for scans; 1000-page PDFs | RapidOCR, page-by-page streaming; measured in the [rule-based evaluation report](docs/EVALUATION_REPORT_rule_based.md) (section 6, 1000 pages in 12 s) |
+| LLM extraction without invented values | [docs/EXTRACTION.md](docs/EXTRACTION.md), [docs/AI_PROMPTS.md](docs/AI_PROMPTS.md) (prompt + grounding check) |
+| Validation (missing fields, totals, duplicates) | [docs/EXTRACTION.md](docs/EXTRACTION.md) |
+| PDF-PDF and PDF-Excel cross-verification | [docs/EXTRACTION.md](docs/EXTRACTION.md), cross-check panel in the web app |
+| REST API with background jobs | [docs/API.md](docs/API.md) |
+| Database with keyword and semantic search | [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md), [docs/SEARCH.md](docs/SEARCH.md) |
+| React frontend | [docs/FRONTEND.md](docs/FRONTEND.md) |
+| Automated tests and results | [docs/TESTING.md](docs/TESTING.md); 239 backend + 39 frontend tests, 90% backend coverage; CI in `.github/workflows/ci.yml` |
+| Evaluation report with measured metrics | [docs/EVALUATION_REPORT.md](docs/EVALUATION_REPORT.md) |
+| Architecture diagram and schema | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) |
+| AI prompts and AI-assisted development disclosure | [docs/AI_PROMPTS.md](docs/AI_PROMPTS.md) |
+
+## Measured results (synthetic benchmark)
+
+Produced by `python manage.py run_evaluation` on 67 files / 116 invoices with exact ground truth (digital and scanned PDFs, photos,
+TIFF, XLSX/XLS/CSV; some invoices carry a discount line). This run used the **LLM extractor** (Groq, `openai/gpt-oss-120b`) and the
+real embedding model (`BAAI/bge-small-en-v1.5`). The same benchmark with the rule-based fallback is in
+[docs/EVALUATION_REPORT_rule_based.md](docs/EVALUATION_REPORT_rule_based.md) (precision 99.7%, recall 97.4%).
+
+| Measure | Result |
+|---|---|
+| Field extraction (precision / recall / F1) | 99.3% / 98.2% / 98.7% |
+| Invented values | 0.71% of returned values (7 wrong, mostly OCR misreads such as `SI/1422` read as `Sl/1422`; 0 where the document has no value) |
+| Invoices found | 116 of 116, no extra invoices |
+| Digital PDF and Excel/CSV registers | 100% of invoices fully correct |
+| Scans / photos (recall) | 89% / 82%, limited by OCR quality |
+| Injected problems detected | 17 of 17 (missing field, total mismatch, duplicate file, duplicate invoice, cross-check) |
+| Alarms on files with no injected problem | 1 of 54 (a line-item mismatch) |
+| PDF-vs-PDF / PDF-vs-Excel verdicts | 12 of 12 correct |
+| Search, hybrid mode (Hit@1 / Hit@5 / MRR) | 94.4% / 100% / 0.972 (keyword alone: 55.6% / 55.6% / 0.556) |
+| Speed | LLM mode took a median of about 9 s per file on the free Groq tier; the rule-based path takes about 25 ms per digital PDF |
+| 1000-page PDF (200 invoices), rule-based | 12.0 s, 190 MB peak memory |
+
+Limits: the data is synthetic, so real-world accuracy can be lower; scans and photos are simulated; the run is one
+machine and one seed. Full tables: [docs/EVALUATION_REPORT.md](docs/EVALUATION_REPORT.md).
+
+## Known limitations
+
+- Vectors are compared with NumPy in the application, not in a vector database (fine for tens of thousands of chunks; pgvector is the documented scale-up path).
+- LLM mode makes one API call per invoice, so very large files are limited by the free-tier rate limit.
+- OCR runs on CPU, so scans are slower than digital PDFs.
+- The auth token is kept in `localStorage` (simple, but exposed to XSS); a production deployment would use HttpOnly cookies.
+- Only English and Latin-script documents were evaluated.
+
+## AI-assisted development
+
+AI tools were used to help write this project. The honest description, the prompts used by the product, and how
+the output was checked are in [docs/AI_PROMPTS.md](docs/AI_PROMPTS.md).
 
 ## Tech stack
 
@@ -84,7 +141,7 @@ Create a login first: `python manage.py create_api_user alice` (run inside `back
 `CELERY_TASK_ALWAYS_EAGER=true` in `.env` so uploads are processed immediately.
 
 Features: sign in, multi-file drag-and-drop upload with per-file progress, live processing status,
-invoice review with validation issues, inline correction (audit trail), manual invoice entry,
+a header with quick search and an API status indicator, a profile page (usage and API token), a footer, invoice review with validation issues (including discount), inline correction (audit trail), manual invoice entry,
 PDF-vs-PDF / PDF-vs-Excel cross-check view, original file preview, extracted text per page,
 invoice list with filters, and keyword / semantic / hybrid search.
 
@@ -164,13 +221,12 @@ Process an invoice PDF and an Excel register containing the same invoice to see 
 
 ## Documentation
 
+- [Architecture](docs/ARCHITECTURE.md) and [database schema](docs/DATABASE_SCHEMA.md)
+- [REST API](docs/API.md) and [search](docs/SEARCH.md)
+- [Document processing](docs/PROCESSING.md) and [AI extraction, validation, cross-verification](docs/EXTRACTION.md)
 - [Web app](docs/FRONTEND.md)
-- [Testing and evaluation](docs/TESTING.md) and the [evaluation report](docs/EVALUATION_REPORT.md)
-- [REST API](docs/API.md)
-- [Search](docs/SEARCH.md)
-- [Database schema](docs/DATABASE_SCHEMA.md)
-- [Document processing pipelines](docs/PROCESSING.md)
-- [AI extraction, validation and cross-verification](docs/EXTRACTION.md)
+- [Testing](docs/TESTING.md) and the evaluation reports: [LLM run](docs/EVALUATION_REPORT.md), [rule-based baseline](docs/EVALUATION_REPORT_rule_based.md)
+- [AI prompts and disclosure](docs/AI_PROMPTS.md)
 
 ## License
 

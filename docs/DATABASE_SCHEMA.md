@@ -1,19 +1,24 @@
 # Database schema
 
-PostgreSQL (with the pgvector extension, used for semantic search from Phase 5).
-SQLite is used only for the optional no-Docker local mode.
+PostgreSQL. SQLite is used only for the optional no-Docker local mode.
+
+![Entity relationship diagram](images/er.png)
+
+Mermaid source (renders on GitHub):
 
 ```mermaid
 erDiagram
-    Document ||--o{ DocumentPage : "has text per page/sheet"
-    Document ||--o{ ExtractionResult : "contains 1..n invoices"
+    User ||--o{ Document : owns
+    Document ||--o{ DocumentPage : "text per page or sheet"
+    Document ||--o{ ExtractionResult : "1 to n invoices"
     Document ||--o{ ProcessingEvent : "processing history"
-    Document ||--o{ ValidationIssue : "flagged problems"
-    ExtractionResult ||--o{ LineItem : "has"
-    ExtractionResult ||--o{ ValidationIssue : "has"
+    Document ||--o{ ValidationIssue : "document-level flags"
+    Document ||--o{ SearchChunk : "search index"
+    Document ||--o{ CrossVerification : "document_a / document_b"
+    ExtractionResult ||--o{ LineItem : has
+    ExtractionResult ||--o{ ValidationIssue : "invoice-level flags"
     ExtractionResult ||--o{ CorrectionLog : "manual edits"
-    Document ||--o{ CrossVerification : "document_a"
-    Document ||--o{ CrossVerification : "document_b"
+    ExtractionResult ||--o{ SearchChunk : "invoice summary"
 
     Document {
         uuid id PK
@@ -29,9 +34,10 @@ erDiagram
     }
     DocumentPage {
         int page_number
-        string source "digital | ocr | spreadsheet"
+        string source "digital, ocr, spreadsheet"
         text text
         float ocr_confidence
+        json table
     }
     ExtractionResult {
         string invoice_number
@@ -40,9 +46,11 @@ erDiagram
         string customer_name
         string currency
         decimal subtotal
+        decimal discount "negative, only if printed"
         decimal tax
         decimal total
         json confidence
+        string method "llm, rules, manual"
         string review_status
         string dedupe_key
     }
@@ -63,6 +71,7 @@ erDiagram
         string field
         text old_value
         text new_value
+        text note
     }
     ProcessingEvent {
         string stage
@@ -70,9 +79,16 @@ erDiagram
         bigint duration_ms
     }
     CrossVerification {
-        string check_type "pdf_pdf | pdf_excel"
+        string check_type "pdf_pdf, pdf_excel"
         string outcome
         json details
+    }
+    SearchChunk {
+        string kind "invoice, page"
+        int page_number
+        text text
+        binary embedding
+        string embedding_model
     }
 ```
 
@@ -91,4 +107,8 @@ erDiagram
   per-field differences in `details`.
 - **Indexes** on status, supplier, invoice number/date and dedupe key keep filtering
   fast as volume grows.
-- A vector-embedding table for semantic search is added in Phase 5.
+- **Search index.** `SearchChunk` stores searchable text (an invoice summary or a slice of a page) and its
+  embedding as raw float32 bytes plus the name of the model that produced it, so keyword and semantic search work
+  on SQLite and PostgreSQL alike and vectors from different models are never compared. For a very large
+  collection a pgvector column with an HNSW index is the next step.
+- **Ownership.** `Document.owner` links each document to a user; every API query is filtered by it.

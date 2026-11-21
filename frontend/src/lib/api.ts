@@ -141,6 +141,16 @@ export const api = {
 };
 
 /** Upload one file with real progress events (fetch cannot report upload progress). */
+/** Public liveness probe used by the header status pill. Never throws: false means "cannot reach the API". */
+export async function checkHealth(): Promise<boolean> {
+  try {
+    const response = await fetch(`${BASE}/health/`, { cache: "no-store" });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 export function uploadFile(file: File, onProgress: (fraction: number) => void): Promise<UploadResponse> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

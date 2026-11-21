@@ -5,7 +5,7 @@
 | Suite | Command | Count |
 |---|---|---|
 | Backend (Django) | `cd backend && python manage.py test` | 239 |
-| Frontend (Vitest + Testing Library) | `cd frontend && npm test` | 31 |
+| Frontend (Vitest + Testing Library) | `cd frontend && npm test` | 39 |
 
 GitHub Actions (`.github/workflows/ci.yml`) runs both suites, the frontend production build and a
 "no missing migrations" check on every push and pull request.

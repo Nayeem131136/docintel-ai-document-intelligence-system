@@ -5,6 +5,13 @@ No UI kit: the small set of components in `src/components/ui.tsx` (including the
 button, border beam, gradient text, number ticker) is written in plain Tailwind and CSS, so there is no heavy
 animation dependency. Animations respect `prefers-reduced-motion`.
 
+## Layout
+
+Every signed-in page shares one layout (`src/components/Layout.tsx`): a dark sidebar (a slide-in menu on phones),
+a sticky **header** with the page title, a quick-search box, an API online/offline indicator (polls `/api/health/`
+every 30 seconds) and the signed-in user (links to the profile page) with a sign-out button, and a **footer** with product links, a health-check
+link and a reminder to review extracted values.
+
 ## Pages
 
 | Route | Purpose |
@@ -14,6 +21,7 @@ animation dependency. Animations respect `prefers-reduced-motion`.
 | `/documents` | Upload, filter by status / name, retry failed, delete. Auto-refreshes while anything is processing |
 | `/documents/:id` | Invoices (review + correct), cross-verification, extracted text per page, original file, activity timeline |
 | `/invoices` | All invoices with filters (supplier, customer, currency, status, dates, totals, open issues) and sorting |
+| `/profile` | Account details, your usage statistics and the API token (hidden until you click Show) |
 | `/search` | Hybrid / keyword / semantic search with filters and highlighted snippets (state kept in the URL) |
 
 ## How it talks to the API
